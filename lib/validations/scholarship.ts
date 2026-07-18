@@ -57,10 +57,6 @@ export const scholarshipSchema = z.object({
   nadoumiServiceFee: z.coerce.number().nonnegative().optional(),
   nadoumiFeeCurrency: z.enum(["RMB", "USD"]).default("USD").optional(),
 
-  // Free-text fields stored in JSON columns on the backend (each is rendered
-  // as a plain <textarea> in ScholarshipForm, not a structured input) — the
-  // form was submitting plain strings against z.any()/z.array(z.any())
-  // schemas that didn't reflect what was actually being collected.
   stipend: z.string().optional(),
   accommodationFee: z.string().optional(),
   applicationDocuments: z.string().optional(),

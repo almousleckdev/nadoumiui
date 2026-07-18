@@ -306,13 +306,6 @@ export interface RegisterPayload {
   preferredLanguages?: string[];
 }
 
-// No `token` field here on purpose: the session is carried entirely by an
-// httpOnly cookie set by the backend, never read by client JS. If a future
-// API client genuinely needs the raw token (see the backend's
-// X-Client-Type: api opt-in), model that as a separate type rather than
-// reintroducing it here — a JS-readable token on this shared type is exactly
-// the kind of field that invites an accidental localStorage write and the
-// XSS-token-theft risk that httpOnly was chosen to avoid.
 export interface AuthResponse {
   student?: Student;
   admin?: Admin;

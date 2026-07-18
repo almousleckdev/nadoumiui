@@ -26,11 +26,6 @@ export function readCookie(name: string): string | undefined {
 //Request Interceptor
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Mirror the CSRF cookie (set by the backend, readable since it's
-    // deliberately not httpOnly) into a header on mutating requests. The
-    // backend rejects cookie-authenticated mutations without a matching
-    // header — see core/middleware/csrf.js on the backend for the full
-    // double-submit-cookie rationale.
     const method = config.method?.toLowerCase();
     if (method && !SAFE_METHODS.has(method)) {
       const csrfToken = readCookie(CSRF_COOKIE_NAME);

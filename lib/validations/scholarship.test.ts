@@ -60,9 +60,6 @@ describe("scholarshipSchema", () => {
   });
 
   it("accepts free-text values for the JSON-backed textarea fields", () => {
-    // These fields are rendered as plain <textarea> inputs in ScholarshipForm,
-    // not structured objects — the schema must accept whatever string a user
-    // types, not reject it as a validation failure.
     const result = scholarshipSchema.safeParse({
       ...validPayload,
       stipend: "2500 RMB/month for living expenses",
