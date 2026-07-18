@@ -1,0 +1,54 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    name: Typecheck, test, and build
+    runs-on: ubuntu-latest
+
+    env:
+      NEXT_PUBLIC_API_URL: https://nadoumibackend.up.railway.app/api
+      NEXT_PUBLIC_APP_URL: https://nadoumiui.up.railway.app
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Not a hard gate yet: there is real pre-existing lint debt (unescaped
+      # JSX entities, a handful of `any` casts around a zod/react-hook-form
+      # typing friction point, a couple of setState-in-effect warnings) that
+      # predates this workflow and needs a dedicated triage pass rather than
+      # blocking every PR today. Remove continue-on-error once that's clear.
+      - name: Lint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      # Threshold set to high (not moderate): the one remaining moderate
+      # finding is postcss bundled *inside* next's own node_modules, not
+      # something this project can patch without a major Next.js downgrade —
+      # see the audit notes.
+      - name: Audit dependencies (fails on high/critical)
+        run: npm audit --audit-level=high
+
+      - name: Run tests
+        run: npm run test:coverage
+
+      - name: Build
+        run: npm run build

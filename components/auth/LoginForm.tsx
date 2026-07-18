@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { AuthLayout } from "./AuthLayout";
+import { getErrorMessage, getErrorStatus } from "@/utils/getErrorMessage";
 
 export interface LoginFormProps {
   title: string;
@@ -48,14 +49,12 @@ export function LoginForm({
 
       await onLogin({ email, password });
       router.push(onSuccessRedirect);
-    } catch (err: any) {
-      const status = err.response?.status;
-      if (status === 401 || status === 403 || err.message?.includes("401")) {
+    } catch (err) {
+      const status = getErrorStatus(err);
+      if (status === 401 || status === 403) {
         setError("Invalid email or password.");
       } else {
-        setError(
-          err.response?.data?.error?.message || err.response?.data?.message || err.message || "Invalid credentials. Please try again."
-        );
+        setError(getErrorMessage(err, "Invalid credentials. Please try again."));
       }
     } finally {
       setIsLoading(false);

@@ -17,6 +17,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import OTPVerification from "./components/OTPVerification";
 import { AuthLayout } from "@/components/auth/AuthLayout";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 const currentLevelOptions = [
   { value: "High School", label: "High School" },
@@ -134,10 +135,8 @@ export default function StudentRegisterPage() {
 
       toast.success("Account created successfully!");
       setRegisteredEmail(data.email);
-    } catch (err: unknown) {
-      setServerError(
-        (err as { response?: { data?: { message?: string } }, message?: string }).response?.data?.message || (err as { response?: { data?: { message?: string } }, message?: string }).message || "Registration failed. Please try again."
-      );
+    } catch (err) {
+      setServerError(getErrorMessage(err, "Registration failed. Please try again."));
     }
   };
 

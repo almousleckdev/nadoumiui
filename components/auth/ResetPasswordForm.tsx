@@ -11,6 +11,7 @@ import apiClient from "@/services/apiClient";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { AuthLayout } from "./AuthLayout";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 const resetPasswordSchema = z
   .object({
@@ -68,8 +69,7 @@ export function ResetPasswordForm({ apiEndpoint, loginUrl, forgotPasswordUrl }: 
       setIsSuccess(true);
       toast.success("Password reset successfully!");
     } catch (error) {
-      const err = error as any;
-      toast.error(err.response?.data?.message || "Failed to reset password.");
+      toast.error(getErrorMessage(error, "Failed to reset password."));
     } finally {
       setIsSubmitting(false);
     }

@@ -11,8 +11,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { Check } from "lucide-react";
 import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
 import { verifyEmail, resendOTP } from "@/services/authService";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 const otpSchema = z.object({
   otp: z.string().length(6, "OTP must be 6 digits"),
@@ -33,7 +33,6 @@ export default function OTPVerification({ email }: OTPVerificationProps) {
   const [success, setSuccess] = useState(false);
 
   const {
-    register,
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -56,10 +55,8 @@ export default function OTPVerification({ email }: OTPVerificationProps) {
       setCountdown(60);
 
       toast.success("Verification code resent to your email.");
-    } catch (err: unknown) {
-      setServerError(
-        (err as { response?: { data?: { message?: string } }, message?: string }).response?.data?.message || (err as { response?: { data?: { message?: string } }, message?: string }).message || "Failed to resend OTP"
-      );
+    } catch (err) {
+      setServerError(getErrorMessage(err, "Failed to resend OTP"));
     } finally {
       setIsResending(false);
     }
@@ -74,10 +71,8 @@ export default function OTPVerification({ email }: OTPVerificationProps) {
       setTimeout(() => {
         router.push("/dashboard");
       }, 2000);
-    } catch (err: unknown) {
-      setServerError(
-        (err as { response?: { data?: { message?: string } }, message?: string }).response?.data?.message || (err as { response?: { data?: { message?: string } }, message?: string }).message || "Invalid OTP"
-      );
+    } catch (err) {
+      setServerError(getErrorMessage(err, "Invalid OTP"));
     }
   };
 

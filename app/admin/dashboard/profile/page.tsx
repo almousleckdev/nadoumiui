@@ -15,6 +15,7 @@ import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
 import { Upload } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 export default function AdminProfilePage() {
   const queryClient = useQueryClient();
@@ -56,10 +57,8 @@ export default function AdminProfilePage() {
       queryClient.setQueryData(["adminProfile"], updatedAdmin);
       toast.success("Profile information updated successfully!");
     },
-    onError: (err: any) => {
-      toast.error(
-        err.response?.data?.error?.message || err.response?.data?.message || "Failed to update profile info.",
-      );
+    onError: (err: unknown) => {
+      toast.error(getErrorMessage(err, "Failed to update profile info."));
     },
   });
 
@@ -69,10 +68,8 @@ export default function AdminProfilePage() {
       queryClient.invalidateQueries({ queryKey: ["adminProfile"] });
       toast.success("Profile picture updated successfully!");
     },
-    onError: (err: any) => {
-      toast.error(
-        err.response?.data?.error?.message || err.response?.data?.message || "Failed to upload profile picture.",
-      );
+    onError: (err: unknown) => {
+      toast.error(getErrorMessage(err, "Failed to upload profile picture."));
     },
   });
 
@@ -84,10 +81,8 @@ export default function AdminProfilePage() {
       setNewPassword("");
       setConfirmPassword("");
     },
-    onError: (err: any) => {
-      toast.error(
-        err.response?.data?.error?.message || err.response?.data?.message || "Failed to change password.",
-      );
+    onError: (err: unknown) => {
+      toast.error(getErrorMessage(err, "Failed to change password."));
     },
   });
 

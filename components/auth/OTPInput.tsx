@@ -30,7 +30,7 @@ export function OTPInput({
     const val = e.target.value;
     if (!/^[0-9]*$/.test(val)) return;
 
-    let newValue = value.split("");
+    const newValue = value.split("");
     // Handle single character
     newValue[index] = val.substring(val.length - 1);
     const finalValue = newValue.join("");
@@ -52,7 +52,7 @@ export function OTPInput({
   ) => {
     if (e.key === "Backspace") {
       e.preventDefault();
-      let newValue = value.split("");
+      const newValue = value.split("");
       newValue[index] = "";
       onChange(newValue.join(""));
       if (index > 0) setActiveOTPIndex(index - 1);

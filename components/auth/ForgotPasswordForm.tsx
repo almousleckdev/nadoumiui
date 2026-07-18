@@ -11,6 +11,7 @@ import { CheckCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { AuthLayout } from "./AuthLayout";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 const emailSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -71,8 +72,8 @@ export function ForgotPasswordForm({
       } else {
         toast.success("Password reset instructions sent.");
       }
-    } catch (err: any) {
-      setServerError(err.response?.data?.message || err.message || "Failed to send reset link.");
+    } catch (err) {
+      setServerError(getErrorMessage(err, "Failed to send reset link."));
     }
   };
 
@@ -83,8 +84,8 @@ export function ForgotPasswordForm({
       await onVerifyOtpAndReset(data.otp, data.password);
       toast.success("Password reset successfully! Please log in.");
       if (onSuccessRedirect) onSuccessRedirect();
-    } catch (err: any) {
-      setServerError(err.response?.data?.message || err.message || "Failed to reset password.");
+    } catch (err) {
+      setServerError(getErrorMessage(err, "Failed to reset password."));
     }
   };
 

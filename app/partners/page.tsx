@@ -1,12 +1,15 @@
-"use client";
-
-import React from 'react';
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Navbar from '@/components/common/Navbar';
 import Footer from '@/components/common/Footer';
 
 import { partnersData } from '@/data/partners';
 import { PageHero } from '@/components/ui/PageHero';
+
+export const metadata: Metadata = {
+  title: 'Our Partners | Nadoumi',
+  description: 'We collaborate with top universities and leading organizations to provide the best opportunities for our students.',
+};
 
 export default function PartnersPage() {
   return (

@@ -1,7 +1,12 @@
-import React from "react";
+import { notFound } from "next/navigation";
+import { isAxiosError } from "axios";
 import { getScholarshipById } from "@/services/scholarshipService";
 import ScholarshipDetailsClient from "./ScholarshipDetailsClient";
 import type { Metadata } from "next";
+
+function isNotFoundError(error: unknown): boolean {
+  return isAxiosError(error) && error.response?.status === 404;
+}
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -11,17 +16,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { id } = await params;
   try {
     const scholarship = await getScholarshipById(id);
-    if (!scholarship) {
-      return {
-        title: "Scholarship Not Found - Nadoumi",
-        description: "The requested scholarship details could not be found.",
-      };
-    }
     return {
       title: `${scholarship.title} - Study in China | Nadoumi`,
-      description: scholarship.description ? scholarship.description.substring(0, 160) : "Learn details, eligibility, benefits, and apply for this scholarship on Nadoumi.",
+      description: scholarship.description
+        ? scholarship.description.substring(0, 160)
+        : "Learn details, eligibility, benefits, and apply for this scholarship on Nadoumi.",
     };
-  } catch (error) {
+  } catch {
     return {
       title: "Scholarship Details - Nadoumi",
       description: "Learn details, eligibility, benefits, and apply for this scholarship on Nadoumi.",
@@ -31,12 +32,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ScholarshipDetailsPage({ params }: PageProps) {
   const { id } = await params;
+
+  let scholarship;
   try {
-    const scholarship = await getScholarshipById(id);
-    return <ScholarshipDetailsClient initialData={scholarship} />;
+    scholarship = await getScholarshipById(id);
   } catch (error) {
-    // If details fetch fails on server (e.g. backend offline during build or render),
-    // let Next.js error boundary handle it, or render the client component with empty data
+    // A 404 from the backend means the scholarship genuinely doesn't exist —
+    // render Next's not-found UI. Any other failure (network, 5xx) is a real
+    // error and should surface as one via the route's error boundary, not be
+    // silently treated the same as "not found".
+    if (isNotFoundError(error)) {
+      notFound();
+    }
     throw error;
   }
+
+  return <ScholarshipDetailsClient initialData={scholarship} />;
 }

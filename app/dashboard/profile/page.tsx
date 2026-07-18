@@ -23,6 +23,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { Camera } from "lucide-react";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 const currentLevelOptions = [
   { value: "High School", label: "High School" },
@@ -135,8 +136,8 @@ export default function StudentProfilePage() {
       queryClient.setQueryData(["studentProfile"], data);
       toast.success("Profile updated successfully!");
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.error?.message || err.response?.data?.message || "Failed to update profile.");
+    onError: (err: unknown) => {
+      toast.error(getErrorMessage(err, "Failed to update profile."));
     },
   });
 
@@ -176,8 +177,8 @@ export default function StudentProfilePage() {
       toast.success("Password changed successfully!");
       passwordForm.reset();
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.error?.message || err.response?.data?.message || "Failed to change password.");
+    onError: (err: unknown) => {
+      toast.error(getErrorMessage(err, "Failed to change password."));
     },
   });
 
@@ -194,8 +195,8 @@ export default function StudentProfilePage() {
       queryClient.invalidateQueries({ queryKey: ["studentProfile"] });
       toast.success("Profile picture updated!");
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.error?.message || err.response?.data?.message || "Failed to upload picture.");
+    onError: (err: unknown) => {
+      toast.error(getErrorMessage(err, "Failed to upload picture."));
     },
   });
 
