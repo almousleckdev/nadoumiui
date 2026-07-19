@@ -3,12 +3,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAdminProfile } from "@/services/authService";
 import Loading from "@/components/ui/Loading";
+import ErrorState from "@/components/ui/ErrorState";
 import { AdminAvatarCard } from "./AdminAvatarCard";
 import { AccountInfoForm } from "./AccountInfoForm";
 import { PasswordForm } from "./PasswordForm";
 
 export default function AdminProfilePage() {
-  const { data: admin, isLoading, error } = useQuery({
+  const { data: admin, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ["adminProfile"],
     queryFn: getAdminProfile,
   });
@@ -19,9 +20,12 @@ export default function AdminProfilePage() {
 
   if (error || !admin) {
     return (
-      <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400 font-medium">
-        Failed to fetch admin profile. Please ensure you are logged in.
-      </div>
+      <ErrorState
+        title="We couldn't load your profile"
+        description="Please ensure you are logged in, then try again."
+        onRetry={() => refetch()}
+        isRetrying={isRefetching}
+      />
     );
   }
 

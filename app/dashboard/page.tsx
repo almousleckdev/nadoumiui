@@ -10,20 +10,39 @@ import { DataTable } from "@/components/ui/DataTable";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
+import ErrorState from "@/components/ui/ErrorState";
 import { PlusCircle } from "lucide-react";
 
 export default function StudentDashboardPage() {
-  const { data: profile, isLoading: isProfileLoading } = useQuery({
+  const {
+    data: profile,
+    isLoading: isProfileLoading,
+    error: profileError,
+    refetch: refetchProfile,
+  } = useQuery({
     queryKey: ["studentProfile"],
     queryFn: getStudentProfile,
   });
 
-  const { data: applications, isLoading: isAppsLoading } = useQuery({
+  const {
+    data: applications,
+    isLoading: isAppsLoading,
+    error: appsError,
+    refetch: refetchApps,
+  } = useQuery({
     queryKey: ["studentApplications"],
     queryFn: getStudentApplications,
   });
 
   const isLoading = isProfileLoading || isAppsLoading;
+  const error = profileError || appsError;
+  const [isRetrying, setIsRetrying] = React.useState(false);
+
+  const handleRetry = async () => {
+    setIsRetrying(true);
+    await Promise.all([refetchProfile(), refetchApps()]);
+    setIsRetrying(false);
+  };
 
   // Derive status counters
   const total = applications?.length ?? 0;
@@ -33,6 +52,16 @@ export default function StudentDashboardPage() {
 
   if (isLoading) {
     return <Loading variant="page" text="Loading dashboard..." />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState
+        title="We couldn't load your dashboard"
+        onRetry={handleRetry}
+        isRetrying={isRetrying}
+      />
+    );
   }
 
   const recentApplications = applications?.slice(0, 5) || [];

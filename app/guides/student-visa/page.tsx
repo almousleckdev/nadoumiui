@@ -1,13 +1,12 @@
 import React from 'react';
-import GuideLayout from '../components/GuideLayout';
+import PageShell from '@/components/layout/PageShell';
 import { Check } from "lucide-react";
 
 export default function StudentVisaPage() {
   return (
-    <GuideLayout 
+    <PageShell
       title="Student Visa Guide"
-      subtitle="Navigating Chinese immigration requirements. Learn about the X1 and X2 visas, documentation, and the residence permit process."
-      image="/images/student.jpg"
+      description="Navigating Chinese immigration requirements. Learn about the X1 and X2 visas, documentation, and the residence permit process."
     >
       <div className="space-y-16">
         
@@ -77,6 +76,6 @@ export default function StudentVisaPage() {
         </div>
 
       </div>
-    </GuideLayout>
+    </PageShell>
   );
 }

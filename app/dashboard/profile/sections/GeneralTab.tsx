@@ -39,6 +39,7 @@ export function GeneralTab({ countries, isSaving }: GeneralTabProps) {
               />
             )}
           />
+          {errors.phone && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.phone.message}</p>}
         </div>
 
         <div>
@@ -55,6 +56,7 @@ export function GeneralTab({ countries, isSaving }: GeneralTabProps) {
               />
             )}
           />
+          {errors.country && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.country.message}</p>}
         </div>
 
         <Input label="City" {...register("city")} error={errors.city?.message} />
@@ -74,9 +76,15 @@ export function GeneralTab({ countries, isSaving }: GeneralTabProps) {
               />
             )}
           />
+          {errors.gender && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.gender.message}</p>}
         </div>
 
-        <Input type="date" label="Date of Birth" {...register("dateOfBirth")} />
+        <Input
+          type="date"
+          label="Date of Birth"
+          {...register("dateOfBirth")}
+          error={errors.dateOfBirth?.message}
+        />
       </div>
       <div className="pt-4 flex justify-end">
         <Button type="submit" variant="primary" isLoading={isSaving}>

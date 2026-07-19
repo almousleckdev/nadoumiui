@@ -1,31 +1,3 @@
-export const howToApplySteps = [
-  {
-    number: '01',
-    title: 'Consultation & Profile Evaluation',
-    desc: 'Create an account and fill out your academic profile. Our experts will evaluate your background, GPA, and career goals to recommend the best universities and scholarship tracks.'
-  },
-  {
-    number: '02',
-    title: 'Document Preparation',
-    desc: 'Gather your transcripts, diplomas, passport, study plan, and recommendation letters. We provide templates and review all documents for compliance with Chinese university standards.'
-  },
-  {
-    number: '03',
-    title: 'Application Submission',
-    desc: 'We handle the complex submission process through the university portals and the official CSC (Chinese Scholarship Council) system, ensuring zero errors.'
-  },
-  {
-    number: '04',
-    title: 'Interview Preparation',
-    desc: 'If the university requires an interview, we will conduct mock interviews with you, focusing on the specific questions commonly asked by Chinese admission committees.'
-  },
-  {
-    number: '05',
-    title: 'Admission & Visa',
-    desc: 'Once accepted, we assist you in securing your JW201/202 form and guide you through the student visa (X1/X2) application process at your local embassy.'
-  }
-];
-
 export const scholarshipTypes = [
   {
     title: 'CSC Scholarship',
@@ -56,31 +28,4 @@ export const livingExpenses = [
   { item: 'Food (Campus Canteens)', cost: '100 - 150 USD / month' },
   { item: 'Transportation', cost: '15 - 30 USD / month' },
   { item: 'Internet & Mobile', cost: '10 - 20 USD / month' },
-];
-
-export const cityGuides = [
-  {
-    name: 'Beijing',
-    tag: 'The Cultural Heart',
-    desc: 'Home to Tsinghua and Peking University. A city where ancient history meets modern political power.',
-    image: '/images/team0.jpg'
-  },
-  {
-    name: 'Shanghai',
-    tag: 'The Financial Hub',
-    desc: 'The most international city in China. Famous for its skyline, business opportunities, and fast-paced lifestyle.',
-    image: '/images/team1.jpg'
-  },
-  {
-    name: 'Chengdu',
-    tag: 'The Relaxed Capital',
-    desc: 'Famous for pandas, spicy hotpot, and a famously relaxed lifestyle. Emerging as a massive tech hub.',
-    image: '/images/team2.jpg'
-  },
-  {
-    name: 'Guangzhou',
-    tag: 'The Trade Gateway',
-    desc: 'A booming metropolis in the south, known for its incredible dim sum and massive international trade fairs.',
-    image: '/images/team3.jpg'
-  }
 ];

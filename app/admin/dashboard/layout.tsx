@@ -7,6 +7,7 @@ import { logoutAdmin, getAdminProfile } from "@/services/authService";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import Sidebar, { SidebarLink } from "@/components/layout/Sidebar";
+import Loading from "@/components/ui/Loading";
 import { UserCircle } from "lucide-react";
 
 export default function AdminDashboardLayout({
@@ -44,11 +45,7 @@ export default function AdminDashboardLayout({
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-orange-500 border-r-2" />
-      </div>
-    );
+    return <Loading variant="page" className="min-h-screen bg-gray-50" />;
   }
 
   // If there's an error, the useEffect above will redirect, but we can also return null or loading to avoid flash

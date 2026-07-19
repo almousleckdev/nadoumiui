@@ -9,6 +9,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Pagination from "@/components/ui/Pagination";
+import ErrorState from "@/components/ui/ErrorState";
 import type { Application } from "@/types";
 import { FileText } from "lucide-react";
 
@@ -16,7 +17,7 @@ export default function StudentApplicationsPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
 
-  const { data: applications = [], isLoading, error } = useStudentApplications();
+  const { data: applications = [], isLoading, error, refetch, isRefetching } = useStudentApplications();
 
   // Columns for TanStack Table
   const columns = useMemo(
@@ -58,39 +59,41 @@ export default function StudentApplicationsPage() {
         </Link>
       </div>
 
-      {error && (
-        <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-sm text-red-600 font-medium">
-          Failed to load applications. Please check your network or try again.
-        </div>
-      )}
-
-      <Card className="p-0 overflow-hidden border border-gray-200 flex flex-col justify-between">
-        {totalItems === 0 ? (
-          <div className="text-center py-20 px-6">
-            <div className="w-14 h-14 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-400 mb-4 border border-gray-100">
-              <FileText className="w-6 h-6" />
+      {error ? (
+        <ErrorState
+          title="We couldn't load your applications"
+          onRetry={() => refetch()}
+          isRetrying={isRefetching}
+        />
+      ) : (
+        <Card className="p-0 overflow-hidden border border-gray-200 flex flex-col justify-between">
+          {totalItems === 0 ? (
+            <div className="text-center py-20 px-6">
+              <div className="w-14 h-14 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-400 mb-4 border border-gray-100">
+                <FileText className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-bold text-gray-900 font-heading">No applications submitted yet</h3>
+              <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto leading-relaxed">
+                Find fully-funded Chinese university programs and start your application today.
+              </p>
+              <Link href="/scholarships" className="mt-5 inline-block">
+                <Button size="md">Browse Programs</Button>
+              </Link>
             </div>
-            <h3 className="text-base font-bold text-gray-900 font-heading">No applications submitted yet</h3>
-            <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto leading-relaxed">
-              Find fully-funded Chinese university programs and start your application today.
-            </p>
-            <Link href="/scholarships" className="mt-5 inline-block">
-              <Button size="md">Browse Programs</Button>
-            </Link>
-          </div>
-        ) : (
-          <>
-            <DataTable columns={columns} data={paginatedApps} />
+          ) : (
+            <>
+              <DataTable columns={columns} data={paginatedApps} />
 
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-              className="dark:border-gray-200"
-            />
-          </>
-        )}
-      </Card>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                className="dark:border-gray-200"
+              />
+            </>
+          )}
+        </Card>
+      )}
 
       <ApplicationDetailsModal
         application={selectedApp}

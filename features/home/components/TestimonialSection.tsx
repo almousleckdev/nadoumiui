@@ -65,7 +65,7 @@ export function TestimonialSection() {
                   alt={t.name}
                   width={48}
                   height={48}
-                  className="rounded-full object-cover bg-gray-100"
+                  className="w-12 h-12 shrink-0 rounded-full object-cover bg-gray-100"
                 />
                 <div>
                   <h4 className="font-bold text-gray-900 text-sm leading-tight">

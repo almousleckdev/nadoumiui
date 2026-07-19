@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Navbar from "@/components/common/Navbar";
-import Footer from "@/components/common/Footer";
-import { PartnershipInfoPanel } from "./PartnershipInfoPanel";
+import PageShell from "@/components/layout/PageShell";
+import { PartnershipPaths } from "./PartnershipPaths";
+import { PartnershipStats } from "./PartnershipStats";
+import { PartnershipNextSteps } from "./PartnershipNextSteps";
 import { PartnershipForm } from "./PartnershipForm";
 
 export const metadata: Metadata = {
@@ -12,19 +13,40 @@ export const metadata: Metadata = {
 
 export default function PartnershipPage() {
   return (
-    <>
-      <Navbar />
-      <main className="bg-slate-50 flex-grow font-sans pt-24 pb-24 min-h-screen">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row bg-white rounded-3xl overflow-hidden shadow-xl border border-gray-100 max-w-6xl mx-auto">
-            <PartnershipInfoPanel />
-            <div className="w-full lg:w-7/12 p-10 md:p-14">
-              <PartnershipForm />
+    <PageShell
+      title="Partner with Nadoumi"
+      description="Whether you're an agency, a university, a content creator, or a prospective student — let's build something great together."
+      mainClassName="bg-gray-50 min-h-screen"
+    >
+      <div className="space-y-16 sm:space-y-20">
+        <PartnershipPaths />
+
+        <PartnershipStats />
+
+        <section>
+          <div className="max-w-2xl mb-10">
+            <span className="text-orange-600 font-bold tracking-wider uppercase text-xs mb-3 block">
+              Get In Touch
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-3">Tell us about your idea</h2>
+            <p className="text-gray-500 leading-relaxed">
+              Fill out the form below — the more detail you share, the faster we can point you to the right person
+              on our team.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <div className="lg:col-span-4 order-2 lg:order-1">
+              <PartnershipNextSteps />
+            </div>
+            <div className="lg:col-span-8 order-1 lg:order-2">
+              <div className="bg-white border border-gray-200 rounded-2xl p-8 md:p-10 shadow-sm">
+                <PartnershipForm />
+              </div>
             </div>
           </div>
-        </div>
-      </main>
-      <Footer />
-    </>
+        </section>
+      </div>
+    </PageShell>
   );
 }

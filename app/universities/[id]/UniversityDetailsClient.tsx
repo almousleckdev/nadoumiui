@@ -11,6 +11,7 @@ import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
+import ErrorState from "@/components/ui/ErrorState";
 import { MetricCard } from "@/components/ui/MetricCard";
 import { Tabs, Tab } from "@/components/ui/Tabs";
 import { UserGroupIcon, AcademicCapIcon, GlobeAltIcon, StarIcon } from "@heroicons/react/24/outline";
@@ -46,7 +47,7 @@ export default function UniversityDetailsClient({
   const id = (params.id as string) || initialUniversity.id;
   const [activeTab, setActiveTab] = useState<string>("overview");
 
-  const { data: university, isLoading, error } = useQuery({
+  const { data: university, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ["university", id],
     queryFn: () => getUniversityById(id),
     initialData: initialUniversity,
@@ -69,7 +70,24 @@ export default function UniversityDetailsClient({
     );
   }
 
-  if (error || !university) {
+  if (error) {
+    return (
+      <>
+        <Navbar />
+        <main className="min-h-screen pt-28 pb-20 bg-gray-50 flex items-center justify-center px-4">
+          <ErrorState
+            title="We couldn't load this university"
+            onRetry={() => refetch()}
+            isRetrying={isRefetching}
+            className="max-w-md"
+          />
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  if (!university) {
     return (
       <>
         <Navbar />

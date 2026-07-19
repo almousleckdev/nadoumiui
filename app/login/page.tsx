@@ -13,7 +13,6 @@ export default function StudentLoginPage() {
     <LoginForm
       title="Student Portal"
       subtitle="Sign in to manage your applications and profile"
-      theme="light"
       forgotPasswordUrl="/forgot-password"
       registerUrl="/register"
       onLogin={handleLogin}

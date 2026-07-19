@@ -10,7 +10,6 @@ export default function AdminResetPasswordPage() {
         apiEndpoint="/admin/reset-password"
         loginUrl="/admin/login"
         forgotPasswordUrl="/admin/forgot-password"
-        theme="dark"
       />
     </Suspense>
   );

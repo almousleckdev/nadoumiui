@@ -7,7 +7,11 @@ import type { ProfileFormValues } from "../schema";
 import { CURRENT_LEVEL_OPTIONS, STUDY_LEVEL_OPTIONS } from "../schema";
 
 export function EducationTab({ isSaving }: { isSaving: boolean }) {
-  const { register, control } = useFormContext<ProfileFormValues>();
+  const {
+    register,
+    control,
+    formState: { errors },
+  } = useFormContext<ProfileFormValues>();
 
   return (
     <>
@@ -28,12 +32,15 @@ export function EducationTab({ isSaving }: { isSaving: boolean }) {
                 />
               )}
             />
+            {errors.currentLevel && (
+              <p className="mt-1.5 text-xs font-medium text-red-500">{errors.currentLevel.message}</p>
+            )}
           </div>
-          <Input label="University" {...register("university")} />
-          <Input label="Major" {...register("major")} />
+          <Input label="University" {...register("university")} error={errors.university?.message} />
+          <Input label="Major" {...register("major")} error={errors.major?.message} />
           <div className="grid grid-cols-2 gap-4">
-            <Input label="GPA" {...register("gpa")} />
-            <Input label="Grad Year" {...register("gradYear")} />
+            <Input label="GPA" {...register("gpa")} error={errors.gpa?.message} />
+            <Input label="Grad Year" {...register("gradYear")} error={errors.gradYear?.message} />
           </div>
         </div>
       </div>
@@ -55,8 +62,11 @@ export function EducationTab({ isSaving }: { isSaving: boolean }) {
                 />
               )}
             />
+            {errors.studyLevel && (
+              <p className="mt-1.5 text-xs font-medium text-red-500">{errors.studyLevel.message}</p>
+            )}
           </div>
-          <Input label="Desired Field" {...register("desiredField")} />
+          <Input label="Desired Field" {...register("desiredField")} error={errors.desiredField?.message} />
           <div className="sm:col-span-2">
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Preferred Cities</label>
             <Controller
@@ -73,6 +83,9 @@ export function EducationTab({ isSaving }: { isSaving: boolean }) {
                 />
               )}
             />
+            {errors.preferredCities && (
+              <p className="mt-1.5 text-xs font-medium text-red-500">{errors.preferredCities.message}</p>
+            )}
           </div>
         </div>
       </div>

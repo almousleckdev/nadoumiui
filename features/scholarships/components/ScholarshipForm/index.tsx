@@ -46,7 +46,12 @@ export function ScholarshipForm({
   const [isCoverUploading, setIsCoverUploading] = useState(false);
 
   // Fetch partner universities for dropdown
-  const { data: universitiesData } = useQuery({
+  const {
+    data: universitiesData,
+    error: universitiesError,
+    refetch: refetchUniversities,
+    isRefetching: isRefetchingUniversities,
+  } = useQuery({
     queryKey: ["adminUniversitiesDropdown"],
     queryFn: () => getUniversities({ limit: 100 }),
   });
@@ -176,7 +181,24 @@ export function ScholarshipForm({
 
           <div className="flex-1">
             <form id="scholarshipForm" onSubmit={handleFormSubmit} className="space-y-6">
-              {activeTab === "basic" && <BasicInfoTab universityOptions={universityOptions} />}
+              {activeTab === "basic" && (
+                <>
+                  {universitiesError && (
+                    <div className="flex items-center justify-between gap-3 p-3 rounded-lg bg-orange-50 border border-orange-100 text-xs text-orange-700">
+                      <span>Couldn&apos;t load the university list.</span>
+                      <button
+                        type="button"
+                        onClick={() => refetchUniversities()}
+                        disabled={isRefetchingUniversities}
+                        className="font-semibold underline hover:no-underline disabled:opacity-50"
+                      >
+                        {isRefetchingUniversities ? "Retrying..." : "Retry"}
+                      </button>
+                    </div>
+                  )}
+                  <BasicInfoTab universityOptions={universityOptions} />
+                </>
+              )}
               {activeTab === "academic" && <AcademicTab />}
               {activeTab === "eligibility" && <EligibilityTab />}
               {activeTab === "financials" && <FinancialsTab />}

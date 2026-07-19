@@ -19,8 +19,8 @@ const emailSchema = z.object({
 
 const otpSchema = z.object({
   otp: z.string().length(6, "OTP must be exactly 6 characters"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string().min(6, "Confirm your password"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string().min(8, "Confirm your password"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -32,7 +32,6 @@ type OTPFormValues = z.infer<typeof otpSchema>;
 export interface ForgotPasswordFormProps {
   title: string;
   subtitle: string;
-  theme?: "light" | "dark";
   useOtp?: boolean;
   loginUrl: string;
   onSendEmail: (email: string) => Promise<void>;

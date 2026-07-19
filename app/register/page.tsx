@@ -78,7 +78,11 @@ export default function StudentRegisterPage() {
   }
 
   return (
-    <AuthLayout title="Create Student Account" subtitle="Get access to premium scholarships and application guidance">
+    <AuthLayout
+      title="Create Student Account"
+      subtitle="Get access to premium scholarships and application guidance"
+      align="start"
+    >
       {serverError && (
         <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-100 text-sm text-red-600 font-medium">
           {serverError}

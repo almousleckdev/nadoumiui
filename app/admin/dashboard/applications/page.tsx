@@ -9,6 +9,8 @@ import Card from "@/components/ui/Card";
 import Select from "@/components/ui/Select";
 import Pagination from "@/components/ui/Pagination";
 import Loading from "@/components/ui/Loading";
+import ErrorState from "@/components/ui/ErrorState";
+import EmptyState from "@/components/ui/EmptyState";
 import type { Application, ApplicationStatus } from "@/types";
 
 export default function AdminApplicationsPage() {
@@ -23,7 +25,7 @@ export default function AdminApplicationsPage() {
     ...(statusFilter ? { status: statusFilter as ApplicationStatus } : {}),
   };
 
-  const { data: responseData, isLoading, error } = useAdminApplications(filters);
+  const { data: responseData, isLoading, error, refetch, isRefetching } = useAdminApplications(filters);
 
   const columns = useMemo(
     () => getAdminApplicationColumns({ onUpdateStatus: setSelectedApp }),
@@ -46,10 +48,6 @@ export default function AdminApplicationsPage() {
     { value: "rejected", label: "Rejected" },
     { value: "waitlisted", label: "Waitlisted" },
   ];
-
-  if (isLoading) {
-    return <Loading variant="page" text="Loading applications..." />;
-  }
 
   const items = responseData?.applications || [];
   const totalPages = responseData?.totalPages || 1;
@@ -80,36 +78,41 @@ export default function AdminApplicationsPage() {
         </div>
       </div>
 
-      {error && (
-        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400 font-medium">
-          Error loading applications list. Ensure your backend databases are correctly provisioned.
-        </div>
-      )}
-
-      {/* Applications Table Card */}
-      <Card className="p-0 overflow-hidden flex flex-col justify-between">
-        {items.length === 0 ? (
-          <div className="text-center py-20 text-gray-500 text-sm">
-            No applications match this filter query.
-          </div>
-        ) : (
-          <>
-            <DataTable columns={columns} data={items} />
-
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              onPageChange={setCurrentPage}
-              onItemsPerPageChange={(newLimit) => {
-                setItemsPerPage(newLimit);
-                setCurrentPage(1);
-              }}
+      {error ? (
+        <ErrorState
+          title="We couldn't load the applications list"
+          onRetry={() => refetch()}
+          isRetrying={isRefetching}
+        />
+      ) : (
+        /* Applications Table Card */
+        <Card className="p-0 overflow-hidden flex flex-col justify-between">
+          {isLoading ? (
+            <Loading variant="page" text="Loading applications..." className="min-h-[20rem]" />
+          ) : items.length === 0 ? (
+            <EmptyState
+              title="No applications match this filter"
+              description="Try adjusting or clearing the status filter above."
             />
-          </>
-        )}
-      </Card>
+          ) : (
+            <>
+              <DataTable columns={columns} data={items} />
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={(newLimit) => {
+                  setItemsPerPage(newLimit);
+                  setCurrentPage(1);
+                }}
+              />
+            </>
+          )}
+        </Card>
+      )}
 
       {selectedApp && (
         <AdminUpdateStatusModal

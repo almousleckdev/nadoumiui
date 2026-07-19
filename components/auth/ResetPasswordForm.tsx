@@ -29,7 +29,6 @@ export interface ResetPasswordFormProps {
   apiEndpoint: string;
   loginUrl: string;
   forgotPasswordUrl: string;
-  theme?: "light" | "dark";
 }
 
 export function ResetPasswordForm({ apiEndpoint, loginUrl, forgotPasswordUrl }: ResetPasswordFormProps) {

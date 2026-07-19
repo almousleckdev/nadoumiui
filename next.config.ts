@@ -20,6 +20,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "res.cloudinary.com" },
       { protocol: "https", hostname: backendHostname },
+      // Wikimedia Commons — stable, freely-licensed city landmark photos used on /guides/city-guides
+      { protocol: "https", hostname: "upload.wikimedia.org" },
     ],
   },
   async headers() {

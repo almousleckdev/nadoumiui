@@ -24,6 +24,7 @@ export async function getScholarships(
   if (filters?.scholarshipCategory) params.scholarshipCategory = filters.scholarshipCategory;
   if (filters?.teachingLanguage) params.teachingLanguage = filters.teachingLanguage;
   if (filters?.isTop !== undefined) params.isTop = filters.isTop;
+  if (filters?.isHot !== undefined) params.isHot = filters.isHot;
   if (filters?.isRecommended !== undefined) params.isRecommended = filters.isRecommended;
   if (filters?.status) params.status = filters.status;
   if (filters?.page) params.page = filters.page;

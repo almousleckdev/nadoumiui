@@ -8,6 +8,8 @@ import {
 } from "@/services/scholarshipService";
 import { type ScholarshipFormValues } from "@/lib/validations/scholarship";
 import { ScholarshipForm } from "@/features/scholarships/components/ScholarshipForm";
+import Loading from "@/components/ui/Loading";
+import ErrorState from "@/components/ui/ErrorState";
 import { toast } from "react-hot-toast";
 
 export default function EditScholarshipPage() {
@@ -19,6 +21,8 @@ export default function EditScholarshipPage() {
     data: scholarship,
     isLoading: isScholarshipLoading,
     error: fetchError,
+    refetch,
+    isRefetching,
   } = useQuery({
     queryKey: ["adminScholarship", id],
     queryFn: () => getScholarshipById(id),
@@ -92,18 +96,25 @@ export default function EditScholarshipPage() {
   };
 
   if (isScholarshipLoading) {
+    return <Loading variant="page" text="Loading scholarship data..." />;
+  }
+
+  if (fetchError) {
     return (
-      <div className="text-center py-20 text-gray-500 text-sm animate-pulse">
-        Loading scholarship data...
-      </div>
+      <ErrorState
+        title="We couldn't load this scholarship"
+        onRetry={() => refetch()}
+        isRetrying={isRefetching}
+      />
     );
   }
 
-  if (fetchError || !scholarship) {
+  if (!scholarship) {
     return (
-      <div className="p-4 rounded-xl bg-red-950/40 border border-red-900/60 text-sm text-red-400 font-medium">
-        Error loading scholarship.
-      </div>
+      <ErrorState
+        title="Scholarship not found"
+        description="It may have been deleted. Go back and try another one."
+      />
     );
   }
 

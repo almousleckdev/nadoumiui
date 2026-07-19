@@ -15,7 +15,6 @@ export default function AdminLoginPage() {
     <LoginForm
       title="Administrator Log In"
       subtitle="Access the internal application and management panel"
-      theme="dark"
       forgotPasswordUrl="/admin/forgot-password"
       backUrl="/"
       onLogin={handleLogin}

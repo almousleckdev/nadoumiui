@@ -10,7 +10,6 @@ export default function StudentResetPasswordPage() {
         apiEndpoint="/students/reset-password"
         loginUrl="/login"
         forgotPasswordUrl="/forgot-password"
-        theme="light"
       />
     </Suspense>
   );

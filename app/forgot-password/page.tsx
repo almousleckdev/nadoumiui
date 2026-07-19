@@ -26,7 +26,6 @@ export default function StudentForgotPasswordPage() {
     <ForgotPasswordForm
       title="Forgot your password?"
       subtitle="Enter your email address and we'll send you an OTP."
-      theme="light"
       useOtp={true}
       loginUrl="/login"
       onSendEmail={handleSendEmail}

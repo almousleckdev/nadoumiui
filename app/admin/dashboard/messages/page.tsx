@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { getConversations, getMessages, sendMessage, uploadMessageFile } from "@/services/messageService";
 import Card from "@/components/ui/Card";
+import ErrorState from "@/components/ui/ErrorState";
 import type { Conversation, Message } from "@/types";
 import { File, MessageSquare } from "lucide-react";
 import { useConversationSocket } from "@/features/messages/hooks/useConversationSocket";
@@ -22,12 +23,24 @@ function ChatWorkspace() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: conversations = [], isLoading: isConvLoading } = useQuery({
+  const {
+    data: conversations = [],
+    isLoading: isConvLoading,
+    error: convError,
+    refetch: refetchConversations,
+    isRefetching: isRefetchingConversations,
+  } = useQuery({
     queryKey: ["conversationsList"],
     queryFn: getConversations,
   });
 
-  const { data: messages = [], isLoading: isMessagesLoading } = useQuery({
+  const {
+    data: messages = [],
+    isLoading: isMessagesLoading,
+    error: messagesError,
+    refetch: refetchMessages,
+    isRefetching: isRefetchingMessages,
+  } = useQuery({
     queryKey: ["messagesThread", activeConv?.id],
     queryFn: () => (activeConv ? getMessages(activeConv.id) : Promise.resolve([])),
     enabled: Boolean(activeConv),
@@ -122,6 +135,13 @@ function ChatWorkspace() {
             <div className="text-center py-12 text-gray-400 text-xs animate-pulse">
               Loading support conversations...
             </div>
+          ) : convError ? (
+            <ErrorState
+              title="Couldn't load conversations"
+              onRetry={() => refetchConversations()}
+              isRetrying={isRefetchingConversations}
+              className="border-0 bg-transparent py-8 px-2"
+            />
           ) : conversations.length === 0 ? (
             <div className="text-center py-12 text-gray-400 text-xs">No inquiries received yet.</div>
           ) : (
@@ -191,6 +211,13 @@ function ChatWorkspace() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/40">
               {isMessagesLoading ? (
                 <div className="text-center py-12 text-gray-400 text-xs">Loading chat messages...</div>
+              ) : messagesError ? (
+                <ErrorState
+                  title="Couldn't load this conversation"
+                  onRetry={() => refetchMessages()}
+                  isRetrying={isRefetchingMessages}
+                  className="border-0 bg-transparent py-8 px-2"
+                />
               ) : messages.length === 0 ? (
                 <div className="text-center py-12 text-gray-400 text-xs">
                   No messages in this chat. Type below to send a message.

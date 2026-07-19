@@ -8,6 +8,9 @@ import { StudentProfileModal } from "@/features/students/components/StudentProfi
 import { DataTable } from "@/components/ui/DataTable";
 import Card from "@/components/ui/Card";
 import Pagination from "@/components/ui/Pagination";
+import ErrorState from "@/components/ui/ErrorState";
+import EmptyState from "@/components/ui/EmptyState";
+import Loading from "@/components/ui/Loading";
 
 export default function AdminStudentsPage() {
   const router = useRouter();
@@ -15,7 +18,7 @@ export default function AdminStudentsPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
-  const { data, isLoading, error } = useAdminStudents(currentPage, itemsPerPage);
+  const { data, isLoading, error, refetch, isRefetching } = useAdminStudents(currentPage, itemsPerPage);
   const chatMutation = useCreateChat();
 
   const handleStartChat = () => {
@@ -42,36 +45,39 @@ export default function AdminStudentsPage() {
         </p>
       </div>
 
-      {error && (
-        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400 font-medium">
-          Error loading student databases. Verify backend parameters.
-        </div>
-      )}
-
-      <Card className="p-0 overflow-hidden flex flex-col justify-between">
-        {isLoading ? (
-          <div className="text-center py-20 text-gray-500 text-sm animate-pulse">
-            Loading student registry records...
-          </div>
-        ) : students.length === 0 ? (
-          <div className="text-center py-20 text-gray-500 text-sm">No registered students found in the database.</div>
-        ) : (
-          <>
-            <DataTable columns={columns} data={students} />
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              onPageChange={setCurrentPage}
-              onItemsPerPageChange={(newLimit) => {
-                setItemsPerPage(newLimit);
-                setCurrentPage(1);
-              }}
+      {error ? (
+        <ErrorState
+          title="We couldn't load the student registry"
+          onRetry={() => refetch()}
+          isRetrying={isRefetching}
+        />
+      ) : (
+        <Card className="p-0 overflow-hidden flex flex-col justify-between">
+          {isLoading ? (
+            <Loading variant="page" text="Loading students..." className="min-h-[20rem]" />
+          ) : students.length === 0 ? (
+            <EmptyState
+              title="No registered students found"
+              description="Students will appear here once they create an account."
             />
-          </>
-        )}
-      </Card>
+          ) : (
+            <>
+              <DataTable columns={columns} data={students} />
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={(newLimit) => {
+                  setItemsPerPage(newLimit);
+                  setCurrentPage(1);
+                }}
+              />
+            </>
+          )}
+        </Card>
+      )}
 
       <StudentProfileModal
         student={selectedStudent}

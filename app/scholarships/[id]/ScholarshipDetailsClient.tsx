@@ -9,6 +9,7 @@ import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
+import ErrorState from "@/components/ui/ErrorState";
 import { Timeline, TimelineStep } from "@/components/ui/Timeline";
 import { ClockIcon, AcademicCapIcon, DocumentCheckIcon, CheckCircleIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { ScholarshipHero } from "./ScholarshipHero";
@@ -48,7 +49,7 @@ export default function ScholarshipDetailsPage({ initialData }: ScholarshipDetai
   const router = useRouter();
   const id = (params.id as string) || initialData.id;
 
-  const { data: scholarship, isLoading, error } = useQuery({
+  const { data: scholarship, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ["scholarship", id],
     queryFn: () => getScholarshipById(id),
     initialData: initialData,
@@ -64,7 +65,24 @@ export default function ScholarshipDetailsPage({ initialData }: ScholarshipDetai
     );
   }
 
-  if (error || !scholarship) {
+  if (error) {
+    return (
+      <>
+        <Navbar />
+        <main className="min-h-screen pt-28 pb-20 bg-gray-50 flex items-center justify-center px-4">
+          <ErrorState
+            title="We couldn't load this scholarship"
+            onRetry={() => refetch()}
+            isRetrying={isRefetching}
+            className="max-w-md"
+          />
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  if (!scholarship) {
     return (
       <>
         <Navbar />

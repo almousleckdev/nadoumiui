@@ -2,6 +2,8 @@
 
 export type UniversityType = "Public" | "Private";
 export type UniversityStatus = "active" | "inactive" | "draft";
+export type PartnerStatus = "active" | "inactive" | "draft";
+export type Currency = "RMB" | "USD";
 export type ScholarshipAvailability = "Available" | "Limited" | "Not_Available";
 
 export type ProgramCategory = "Language" | "Bachelor" | "Master" | "PhD";
@@ -80,6 +82,76 @@ export interface University {
   status: UniversityStatus;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Partner {
+  id: string;
+  partnerId: string;
+  nameEn: string;
+  nameCn?: string | null;
+  logo?: string | null;
+  topMajors: string[];
+  research?: string | null;
+  province?: string | null;
+  city?: string | null;
+  rank?: number | null;
+  totalStudents?: number | null;
+  totalForeignStudents?: number | null;
+  totalColleges?: number | null;
+  introduction?: string | null;
+  website?: string | null;
+  order: number;
+  status: PartnerStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProgramAccommodation {
+  id: string;
+  programId: string;
+  roomType: string;
+  isFree: boolean;
+  price?: number | null;
+  currency: Currency;
+}
+
+export interface Program {
+  id: string;
+  scholarshipId: string;
+  category: ProgramCategory;
+  programName?: string | null;
+  majors: string[];
+  field?: string | null;
+  fields: string[];
+  teachingLanguage: TeachingLanguage;
+  duration?: number | null;
+  intake?: string | null;
+  startDate?: string | null;
+  stipendEnabled: boolean;
+  stipendAmount?: number | null;
+  stipendUnit?: string | null;
+  tuitionFee?: number | null;
+  tuitionFeeAfter?: number | null;
+  applicationFee?: number | null;
+  serviceFee?: number | null;
+  currency: Currency;
+  notes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  accommodations?: ProgramAccommodation[];
+  scholarship?: Scholarship;
+}
+
+export interface ProgramFilters {
+  search?: string;
+  category?: ProgramCategory;
+  teachingLanguage?: TeachingLanguage;
+  field?: string;
+  tuitionMin?: number;
+  tuitionMax?: number;
+  page?: number;
+  limit?: number;
+  sort?: "popular" | "newest";
 }
 
 export interface Scholarship {
@@ -318,6 +390,7 @@ export interface ScholarshipFilters {
   scholarshipCategory?: ScholarshipCategory;
   teachingLanguage?: TeachingLanguage;
   isTop?: boolean;
+  isHot?: boolean;
   isRecommended?: boolean;
   status?: ScholarshipStatus;
   page?: number;
@@ -328,9 +401,19 @@ export interface UniversityFilters {
   search?: string;
   city?: string;
   province?: string;
+  type?: UniversityType;
   isPartner?: boolean;
   isRecommended?: boolean;
   isTop?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+export interface PartnerFilters {
+  search?: string;
+  city?: string;
+  province?: string;
+  status?: PartnerStatus;
   page?: number;
   limit?: number;
 }

@@ -1,15 +1,14 @@
 import React from 'react';
-import GuideLayout from '../components/GuideLayout';
+import PageShell from '@/components/layout/PageShell';
 import { Check } from "lucide-react";
 
 import { scholarshipTypes as scholarships } from '@/data/guides';
 
 export default function ScholarshipTypesPage() {
   return (
-    <GuideLayout 
+    <PageShell
       title="Scholarship Types"
-      subtitle="Explore the various financial aid options available in China. From fully-funded government grants to university-specific waivers."
-      image="/images/student.jpg"
+      description="Explore the various financial aid options available in China. From fully-funded government grants to university-specific waivers."
     >
       <div className="space-y-16">
         
@@ -69,6 +68,6 @@ export default function ScholarshipTypesPage() {
         </div>
 
       </div>
-    </GuideLayout>
+    </PageShell>
   );
 }

@@ -12,7 +12,6 @@ export default function AdminForgotPasswordPage() {
     <ForgotPasswordForm
       title="Reset Password"
       subtitle="Enter your admin email to receive reset instructions."
-      theme="dark"
       useOtp={false}
       loginUrl="/admin/login"
       onSendEmail={handleSendEmail}

@@ -22,6 +22,7 @@ export async function getUniversities(
   if (filters?.search) params.search = filters.search;
   if (filters?.city) params.city = filters.city;
   if (filters?.province) params.province = filters.province;
+  if (filters?.type) params.type = filters.type;
   if (filters?.isPartner !== undefined) params.isPartner = filters.isPartner;
   if (filters?.isRecommended !== undefined) params.isRecommended = filters.isRecommended;
   if (filters?.isTop !== undefined) params.isTop = filters.isTop;

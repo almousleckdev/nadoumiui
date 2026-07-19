@@ -10,6 +10,7 @@ import "react-phone-number-input/style.css";
 
 import { getStudentProfile, updateStudentProfile, updateProfilePicture } from "@/services/authService";
 import Card from "@/components/ui/Card";
+import ErrorState from "@/components/ui/ErrorState";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { updateProfileSchema, type ProfileFormValues } from "./schema";
 import { ProfileSidebarCard, type ProfileTab } from "./ProfileSidebarCard";
@@ -23,7 +24,7 @@ export default function StudentProfilePage() {
   const [countries] = useState(() => countryList().getData());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ["studentProfile"],
     queryFn: getStudentProfile,
   });
@@ -121,6 +122,16 @@ export default function StudentProfilePage() {
         <div className="h-10 bg-gray-200 rounded-lg w-1/4" />
         <div className="h-[500px] bg-gray-200 rounded-xl" />
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorState
+        title="We couldn't load your profile"
+        onRetry={() => refetch()}
+        isRetrying={isRefetching}
+      />
     );
   }
 

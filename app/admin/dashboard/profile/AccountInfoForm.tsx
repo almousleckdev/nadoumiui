@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { toast } from "react-hot-toast";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
@@ -8,19 +11,34 @@ import { updateAdminProfile } from "@/services/authService";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import type { Admin } from "@/types";
 
+const accountInfoSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
+  phone: z.string().optional(),
+  country: z.string().optional(),
+});
+
+type AccountInfoFormValues = z.infer<typeof accountInfoSchema>;
+
 export function AccountInfoForm({ admin }: { admin: Admin }) {
   const queryClient = useQueryClient();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [country, setCountry] = useState("");
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<AccountInfoFormValues>({
+    resolver: zodResolver(accountInfoSchema),
+  });
 
   useEffect(() => {
-    setName(admin.name || "");
-    setEmail(admin.email || "");
-    setPhone(admin.phone || "");
-    setCountry(admin.country || "");
-  }, [admin]);
+    reset({
+      name: admin.name || "",
+      email: admin.email || "",
+      phone: admin.phone || "",
+      country: admin.country || "",
+    });
+  }, [admin, reset]);
 
   const updateProfileMutation = useMutation({
     mutationFn: updateAdminProfile,
@@ -33,54 +51,47 @@ export function AccountInfoForm({ admin }: { admin: Admin }) {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) {
-      toast.error("Name cannot be empty.");
-      return;
-    }
+  const onSubmit = (data: AccountInfoFormValues) => {
     updateProfileMutation.mutate({
-      name,
-      email,
-      phone: phone || null,
-      country: country || null,
+      name: data.name,
+      email: data.email,
+      phone: data.phone || null,
+      country: data.country || null,
     });
   };
 
   return (
     <Card className="p-6 bg-white border-gray-200">
       <h2 className="text-lg font-bold text-gray-900 font-heading mb-6">Account Information</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Administrator"
-            required
+            error={errors.name?.message}
+            {...register("name")}
           />
           <Input
             label="Email Address"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
             placeholder="e.g. admin@nadoumi.com"
-            required
+            error={errors.email?.message}
+            {...register("email")}
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Phone Number"
             type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
             placeholder="e.g. +86 138 0000 0000"
+            error={errors.phone?.message}
+            {...register("phone")}
           />
           <Input
             label="Country/Region"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
             placeholder="e.g. China"
+            error={errors.country?.message}
+            {...register("country")}
           />
         </div>
 

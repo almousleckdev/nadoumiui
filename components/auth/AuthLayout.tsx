@@ -5,10 +5,11 @@ import Image from "next/image";
 export interface AuthLayoutProps {
   title: string;
   subtitle: string;
+  align?: "center" | "start";
   children: React.ReactNode;
 }
 
-export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
+export function AuthLayout({ title, subtitle, align = "center", children }: AuthLayoutProps) {
   return (
     <div className="min-h-screen flex bg-gray-50 overflow-hidden">
       {/* Left Sidebar (Image/Branding) */}
@@ -27,13 +28,13 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
         {/* Branding Content */}
         <div className="absolute bottom-16 left-16 right-16 text-white z-10">
           <Link href="/" className="inline-block bg-white p-3 rounded-2xl mb-8 shadow-xl">
-            <div className="relative h-12 w-40 overflow-hidden">
-              <Image 
-                src="/logo/logo.jpg" 
-                alt="Nadoumi Consulting Logo" 
+            <div className="relative h-14 w-14 overflow-hidden">
+              <Image
+                src="/logo/logo.jpg"
+                alt="Nadoumi Consulting Logo"
                 fill
-                sizes="160px"
-                className="object-contain object-left"
+                sizes="56px"
+                className="object-contain"
               />
             </div>
           </Link>
@@ -47,18 +48,20 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
       </div>
 
       {/* Right Content (Form) */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-16 xl:px-24 bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.05)] z-10">
+      <div
+        className={`w-full lg:w-1/2 flex flex-col justify-center items-center ${align === "start" ? "lg:items-start" : ""} py-12 px-4 sm:px-6 lg:px-16 xl:px-24 bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.05)] z-10`}
+      >
         
         {/* Mobile Logo */}
         <div className="lg:hidden mb-8 w-full max-w-md">
           <Link href="/" className="inline-block bg-white border border-gray-100 p-2.5 rounded-xl shadow-sm">
-            <div className="relative h-10 w-32 overflow-hidden">
-              <Image 
-                src="/logo/logo.jpg" 
-                alt="Nadoumi Consulting Logo" 
+            <div className="relative h-11 w-11 overflow-hidden">
+              <Image
+                src="/logo/logo.jpg"
+                alt="Nadoumi Consulting Logo"
                 fill
-                sizes="128px"
-                className="object-contain object-left"
+                sizes="44px"
+                className="object-contain"
               />
             </div>
           </Link>

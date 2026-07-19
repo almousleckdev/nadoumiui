@@ -10,9 +10,11 @@ import { DataTable } from "@/components/ui/DataTable";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
+import ErrorState from "@/components/ui/ErrorState";
+import EmptyState from "@/components/ui/EmptyState";
 
 export default function AdminDashboardOverviewPage() {
-  const { data: stats, isLoading, error } = useQuery({
+  const { data: stats, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ["adminDashboardStats"],
     queryFn: getDashboardStats,
   });
@@ -27,9 +29,11 @@ export default function AdminDashboardOverviewPage() {
 
   if (error) {
     return (
-      <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-sm text-red-600 font-medium">
-        Failed to fetch administrator statistics. Verify your local backend endpoints.
-      </div>
+      <ErrorState
+        title="We couldn't load dashboard statistics"
+        onRetry={() => refetch()}
+        isRetrying={isRefetching}
+      />
     );
   }
 
@@ -103,9 +107,10 @@ export default function AdminDashboardOverviewPage() {
         {recentSubmissions.length > 0 ? (
           <DataTable columns={adminDashboardRecentApplicationColumns} data={recentSubmissions} />
         ) : (
-          <div className="text-center py-16 text-gray-500 dark:text-gray-500 text-sm">
-            No applications submitted to the system yet.
-          </div>
+          <EmptyState
+            title="No applications submitted yet"
+            description="New applications will show up here as they arrive."
+          />
         )}
       </Card>
     </div>

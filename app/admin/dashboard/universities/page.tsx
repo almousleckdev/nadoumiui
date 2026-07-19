@@ -12,6 +12,9 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Pagination from "@/components/ui/Pagination";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import ErrorState from "@/components/ui/ErrorState";
+import EmptyState from "@/components/ui/EmptyState";
+import Loading from "@/components/ui/Loading";
 
 export default function AdminUniversitiesPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -27,6 +30,8 @@ export default function AdminUniversitiesPage() {
     data: responseData,
     isLoading,
     error,
+    refetch,
+    isRefetching,
   } = useAdminUniversities(currentPage, itemsPerPage);
 
   const deleteMutation = useDeleteUniversity();
@@ -73,40 +78,41 @@ export default function AdminUniversitiesPage() {
         </Link>
       </div>
 
-      {error && (
-        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400 font-medium">
-          Error loading universities list. Please verify backend state.
-        </div>
-      )}
-
-      {/* Main Table Card */}
-      <Card className="p-0 overflow-hidden flex flex-col justify-between">
-        {isLoading ? (
-          <div className="text-center py-20 text-gray-500 text-sm animate-pulse">
-            Loading partner universities...
-          </div>
-        ) : universities.length === 0 ? (
-          <div className="text-center py-20 text-gray-500 text-sm">
-            No universities onboarded. Click "Add University" to begin.
-          </div>
-        ) : (
-          <>
-            <DataTable columns={columns} data={universities} />
-
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              onPageChange={setCurrentPage}
-              onItemsPerPageChange={(newLimit) => {
-                setItemsPerPage(newLimit);
-                setCurrentPage(1);
-              }}
+      {error ? (
+        <ErrorState
+          title="We couldn't load the university directory"
+          onRetry={() => refetch()}
+          isRetrying={isRefetching}
+        />
+      ) : (
+        /* Main Table Card */
+        <Card className="p-0 overflow-hidden flex flex-col justify-between">
+          {isLoading ? (
+            <Loading variant="page" text="Loading universities..." className="min-h-[20rem]" />
+          ) : universities.length === 0 ? (
+            <EmptyState
+              title="No universities onboarded"
+              description='Click "Add University" to begin.'
             />
-          </>
-        )}
-      </Card>
+          ) : (
+            <>
+              <DataTable columns={columns} data={universities} />
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={(newLimit) => {
+                  setItemsPerPage(newLimit);
+                  setCurrentPage(1);
+                }}
+              />
+            </>
+          )}
+        </Card>
+      )}
 
       {/* Confirmation delete modal */}
       <ConfirmationModal

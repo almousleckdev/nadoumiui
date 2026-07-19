@@ -20,7 +20,7 @@ export function Hero() {
   };
 
   return (
-    <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden py-32">
+    <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
       {/* Background Image Container */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <Image

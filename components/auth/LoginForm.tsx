@@ -3,15 +3,24 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { AuthLayout } from "./AuthLayout";
 import { getErrorMessage, getErrorStatus } from "@/utils/getErrorMessage";
 
+const loginSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
 export interface LoginFormProps {
   title: string;
   subtitle: string;
-  theme?: "light" | "dark";
   forgotPasswordUrl: string;
   registerUrl?: string;
   backUrl?: string;
@@ -29,44 +38,36 @@ export function LoginForm({
   onSuccessRedirect,
 }: LoginFormProps) {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-
+  const onSubmit = async (data: LoginFormValues) => {
+    setServerError("");
     try {
-      if (!email.trim() || !password.trim()) {
-        throw new Error("Please fill in all fields.");
-      }
-      if (!/\S+@\S+\.\S+/.test(email)) {
-        throw new Error("Please enter a valid email address.");
-      }
-
-      await onLogin({ email, password });
+      await onLogin(data);
       router.push(onSuccessRedirect);
     } catch (err) {
       const status = getErrorStatus(err);
       if (status === 401 || status === 403) {
-        setError("Invalid email or password.");
+        setServerError("Invalid email or password.");
       } else {
-        setError(getErrorMessage(err, "Invalid credentials. Please try again."));
+        setServerError(getErrorMessage(err, "Invalid credentials. Please try again."));
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
   return (
     <AuthLayout title={title} subtitle={subtitle}>
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        {error && (
+      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
+        {serverError && (
           <div className="p-3.5 rounded-lg text-sm font-medium bg-red-50 border border-red-100 text-red-600">
-            {error}
+            {serverError}
           </div>
         )}
 
@@ -75,10 +76,9 @@ export function LoginForm({
             label="Email Address"
             type="email"
             placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
             autoComplete="email"
+            error={errors.email?.message}
+            {...register("email")}
           />
 
           <div>
@@ -94,10 +94,9 @@ export function LoginForm({
             <Input
               type="password"
               placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
               autoComplete="current-password"
+              error={errors.password?.message}
+              {...register("password")}
             />
           </div>
         </div>
@@ -108,7 +107,7 @@ export function LoginForm({
             variant="primary"
             size="lg"
             className="w-full font-semibold shadow-md shadow-orange-600/20 text-base py-3"
-            isLoading={isLoading}
+            isLoading={isSubmitting}
           >
             Sign In
           </Button>

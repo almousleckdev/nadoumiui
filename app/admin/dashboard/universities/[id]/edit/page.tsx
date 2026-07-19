@@ -5,6 +5,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getUniversityById, updateUniversity } from "@/services/universityService";
 import { type UniversityFormValues } from "@/lib/validations/university";
 import { UniversityForm } from "@/features/universities/components/UniversityForm";
+import Loading from "@/components/ui/Loading";
+import ErrorState from "@/components/ui/ErrorState";
 import { toast } from "react-hot-toast";
 
 export default function EditUniversityPage() {
@@ -12,7 +14,13 @@ export default function EditUniversityPage() {
   const { id } = useParams() as { id: string };
   const queryClient = useQueryClient();
 
-  const { data: university, isLoading: isUniversityLoading, error: fetchError } = useQuery({
+  const {
+    data: university,
+    isLoading: isUniversityLoading,
+    error: fetchError,
+    refetch,
+    isRefetching,
+  } = useQuery({
     queryKey: ["adminUniversity", id],
     queryFn: () => getUniversityById(id),
     enabled: Boolean(id),
@@ -36,11 +44,26 @@ export default function EditUniversityPage() {
   };
 
   if (isUniversityLoading) {
-    return <div className="text-center py-20 text-gray-500 text-sm animate-pulse">Loading university data...</div>;
+    return <Loading variant="page" text="Loading university data..." />;
   }
 
-  if (fetchError || !university) {
-    return <div className="p-4 rounded-xl bg-red-950/40 border border-red-900/60 text-sm text-red-400 font-medium">Error loading university profile.</div>;
+  if (fetchError) {
+    return (
+      <ErrorState
+        title="We couldn't load this university"
+        onRetry={() => refetch()}
+        isRetrying={isRefetching}
+      />
+    );
+  }
+
+  if (!university) {
+    return (
+      <ErrorState
+        title="University not found"
+        description="It may have been deleted. Go back and try another one."
+      />
+    );
   }
 
   return (

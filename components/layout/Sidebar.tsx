@@ -6,16 +6,17 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/utils/cn";
 
-import { 
-  ChevronRight, 
+import {
+  ChevronRight,
   LogOut,
-  LayoutDashboard, 
-  FileText, 
-  GraduationCap, 
-  School, 
-  Users, 
-  MessageSquare, 
-  UserCircle 
+  LayoutDashboard,
+  FileText,
+  GraduationCap,
+  School,
+  Users,
+  MessageSquare,
+  UserCircle,
+  Handshake
 } from "lucide-react";
 
 export interface SidebarLink {
@@ -51,6 +52,7 @@ export default function Sidebar({
     { label: "Applications", href: "/admin/dashboard/applications", icon: <FileText className="w-5 h-5" /> },
     { label: "Scholarships", href: "/admin/dashboard/scholarships", icon: <GraduationCap className="w-5 h-5" /> },
     { label: "Universities", href: "/admin/dashboard/universities", icon: <School className="w-5 h-5" /> },
+    { label: "Partners", href: "/admin/dashboard/partners", icon: <Handshake className="w-5 h-5" /> },
     { label: "Students", href: "/admin/dashboard/students", icon: <Users className="w-5 h-5" /> },
     { label: "Messages", href: "/admin/dashboard/messages", icon: <MessageSquare className="w-5 h-5" /> },
     { label: "Profile Settings", href: "/admin/dashboard/profile", icon: <UserCircle className="w-5 h-5" /> },

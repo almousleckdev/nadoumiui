@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import GuideLayout from "../guides/components/GuideLayout";
+import PageShell from "@/components/layout/PageShell";
 import FAQAccordionItem from "./FAQAccordionItem";
 import { faqs } from "@/data/faqs";
 
@@ -11,10 +11,9 @@ export const metadata: Metadata = {
 
 export default function FAQPage() {
   return (
-    <GuideLayout
+    <PageShell
       title="Frequently Asked Questions"
-      subtitle="Find clear, direct answers to common questions about studying, living, and applying through Nadoumi."
-      image="/images/login-hero.png"
+      description="Find clear, direct answers to common questions about studying, living, and applying through Nadoumi."
     >
       <div className="max-w-3xl mx-auto space-y-6">
         {faqs.map((faq, idx) => (
@@ -38,6 +37,6 @@ export default function FAQPage() {
           </a>
         </div>
       </div>
-    </GuideLayout>
+    </PageShell>
   );
 }

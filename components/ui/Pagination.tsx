@@ -8,6 +8,7 @@ interface PaginationProps {
   itemsPerPage?: number;
   onPageChange: (page: number) => void;
   onItemsPerPageChange?: (limit: number) => void;
+  pageSizeOptions?: number[];
   className?: string;
 }
 
@@ -18,6 +19,7 @@ export default function Pagination({
   itemsPerPage = 10,
   onPageChange,
   onItemsPerPageChange,
+  pageSizeOptions = [5, 10, 25, 50, 100],
   className = "",
 }: PaginationProps) {
   if (totalPages <= 1 && totalItems === undefined) return null;
@@ -59,7 +61,7 @@ export default function Pagination({
               onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
               className="bg-transparent border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 rounded px-2 py-1 text-xs focus:ring-orange-500 focus:border-orange-500"
             >
-              {[5, 10, 25, 50, 100].map((val) => (
+              {pageSizeOptions.map((val) => (
                 <option key={val} value={val} className="dark:bg-slate-800">
                   {val}
                 </option>

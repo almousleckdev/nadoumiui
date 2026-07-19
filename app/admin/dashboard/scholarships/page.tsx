@@ -9,6 +9,9 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Pagination from "@/components/ui/Pagination";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import ErrorState from "@/components/ui/ErrorState";
+import EmptyState from "@/components/ui/EmptyState";
+import Loading from "@/components/ui/Loading";
 
 export default function AdminScholarshipsPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -18,7 +21,7 @@ export default function AdminScholarshipsPage() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [scholarshipToDelete, setScholarshipToDelete] = useState<string | null>(null);
 
-  const { data: responseData, isLoading, error } = useAdminScholarships(currentPage, itemsPerPage);
+  const { data: responseData, isLoading, error, refetch, isRefetching } = useAdminScholarships(currentPage, itemsPerPage);
   
   const deleteMutation = useDeleteScholarship();
 
@@ -66,40 +69,41 @@ export default function AdminScholarshipsPage() {
         </Link>
       </div>
 
-      {error && (
-        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400 font-medium">
-          Error loading scholarships registry. Ensure databases are active.
-        </div>
-      )}
-
-      {/* Main Table Card */}
-      <Card className="p-0 overflow-hidden flex flex-col justify-between">
-        {isLoading ? (
-          <div className="text-center py-20 text-gray-500 text-sm animate-pulse">
-            Loading scholarships metadata...
-          </div>
-        ) : scholarships.length === 0 ? (
-          <div className="text-center py-20 text-gray-500 text-sm">
-            No scholarships found. Click "Add Scholarship" to begin.
-          </div>
-        ) : (
-          <>
-            <DataTable columns={columns} data={scholarships} />
-
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              onPageChange={setCurrentPage}
-              onItemsPerPageChange={(newLimit) => {
-                setItemsPerPage(newLimit);
-                setCurrentPage(1);
-              }}
+      {error ? (
+        <ErrorState
+          title="We couldn't load the scholarships registry"
+          onRetry={() => refetch()}
+          isRetrying={isRefetching}
+        />
+      ) : (
+        /* Main Table Card */
+        <Card className="p-0 overflow-hidden flex flex-col justify-between">
+          {isLoading ? (
+            <Loading variant="page" text="Loading scholarships..." className="min-h-[20rem]" />
+          ) : scholarships.length === 0 ? (
+            <EmptyState
+              title="No scholarships found"
+              description='Click "Add Scholarship" to begin.'
             />
-          </>
-        )}
-      </Card>
+          ) : (
+            <>
+              <DataTable columns={columns} data={scholarships} />
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={(newLimit) => {
+                  setItemsPerPage(newLimit);
+                  setCurrentPage(1);
+                }}
+              />
+            </>
+          )}
+        </Card>
+      )}
 
       {/* Confirmation delete modal */}
       <ConfirmationModal

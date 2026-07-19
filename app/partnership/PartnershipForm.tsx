@@ -1,29 +1,110 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { toast } from "react-hot-toast";
+import Input from "@/components/ui/Input";
+import Select from "@/components/ui/Select";
+import Button from "@/components/ui/Button";
+import { submitPartnershipInquiry, type PartnershipType } from "@/services/partnershipService";
+import { getErrorMessage } from "@/utils/getErrorMessage";
+
+const PARTNERSHIP_TYPE_OPTIONS = [
+  { value: "", label: "Select an option..." },
+  { value: "agency", label: "Student Recruitment Agency" },
+  { value: "university", label: "University / Institution" },
+  { value: "influencer", label: "Content Creator / Influencer" },
+  { value: "student", label: "Student (Looking for admission)" },
+  { value: "other", label: "Other" },
+];
+
+const DEGREE_LEVEL_OPTIONS = [
+  { value: "", label: "Select..." },
+  { value: "bachelor", label: "Bachelor's" },
+  { value: "master", label: "Master's" },
+  { value: "phd", label: "Ph.D." },
+  { value: "language", label: "Language Program" },
+];
+
+const partnershipSchema = z
+  .object({
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    workEmail: z.string().min(1, "Email is required").email("Please enter a valid email address"),
+    phone: z.string().min(1, "Phone number is required"),
+    partnershipType: z.string().min(1, "Please select a partnership type"),
+    companyName: z.string().optional(),
+    degreeLevel: z.string().optional(),
+    intendedMajor: z.string().optional(),
+    preferredCity: z.string().optional(),
+    preferredMeetingDate: z.string().optional(),
+    preferredMeetingTime: z.string().optional(),
+    message: z.string().min(10, "Please tell us a bit more (at least 10 characters)"),
+  })
+  .superRefine((data, ctx) => {
+    if (data.partnershipType === "student") {
+      if (!data.degreeLevel) {
+        ctx.addIssue({ code: "custom", path: ["degreeLevel"], message: "Please select a degree level" });
+      }
+      if (!data.intendedMajor) {
+        ctx.addIssue({ code: "custom", path: ["intendedMajor"], message: "Intended major is required" });
+      }
+      if (!data.preferredCity) {
+        ctx.addIssue({ code: "custom", path: ["preferredCity"], message: "Preferred city is required" });
+      }
+    } else if (!data.companyName) {
+      ctx.addIssue({ code: "custom", path: ["companyName"], message: "Company / agency name is required" });
+    }
+  });
+
+type PartnershipFormValues = z.infer<typeof partnershipSchema>;
 
 export function PartnershipForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [partnershipType, setPartnershipType] = useState("");
   const [userTimezone, setUserTimezone] = useState("");
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors, isSubmitting, isSubmitSuccessful },
+  } = useForm<PartnershipFormValues>({
+    resolver: zodResolver(partnershipSchema),
+    defaultValues: { partnershipType: "" },
+  });
+
+  const partnershipType = watch("partnershipType");
 
   useEffect(() => {
     setUserTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    // Simulate API call to send email
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitted(true);
-    }, 1500);
+  const onSubmit = async (data: PartnershipFormValues) => {
+    try {
+      await submitPartnershipInquiry({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        workEmail: data.workEmail,
+        phone: data.phone,
+        partnershipType: data.partnershipType as PartnershipType,
+        companyName: data.companyName || undefined,
+        degreeLevel: data.partnershipType === "student" ? data.degreeLevel || undefined : undefined,
+        intendedMajor: data.partnershipType === "student" ? data.intendedMajor || undefined : undefined,
+        preferredCity: data.partnershipType === "student" ? data.preferredCity || undefined : undefined,
+        preferredMeetingDate: data.preferredMeetingDate || undefined,
+        preferredMeetingTime: data.preferredMeetingTime || undefined,
+        timezone: userTimezone || undefined,
+        message: data.message,
+      });
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Failed to submit your inquiry. Please try again."));
+      throw err;
+    }
   };
 
-  if (submitted) {
+  if (isSubmitSuccessful) {
     return (
       <div className="h-full flex flex-col items-center justify-center text-center py-12">
         <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-green-100">
@@ -32,9 +113,9 @@ export function PartnershipForm() {
         <h3 className="text-3xl font-bold text-gray-900 mb-3">Inquiry Sent!</h3>
         <p className="text-lg text-gray-600 max-w-md mx-auto">
           Thank you for your interest in partnering with Nadoumi. Our business development team will review your
-          inquiry and get back to you within 24-48 hours.
+          inquiry and get back to you within 24 hours on business days.
         </p>
-        <button onClick={() => setSubmitted(false)} className="mt-8 text-orange-600 font-semibold hover:text-orange-700">
+        <button onClick={() => reset()} className="mt-8 text-orange-600 font-semibold hover:text-orange-700">
           Submit another inquiry
         </button>
       </div>
@@ -43,135 +124,77 @@ export function PartnershipForm() {
 
   return (
     <>
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">Partnership Inquiry Form</h2>
-      <p className="text-gray-500 mb-8">Fill out the form below and we&apos;ll be in touch shortly.</p>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">First Name</label>
-            <input
-              required
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow"
-              placeholder="Jane"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Last Name</label>
-            <input
-              required
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow"
-              placeholder="Doe"
-            />
-          </div>
+          <Input label="First Name" placeholder="Jane" error={errors.firstName?.message} {...register("firstName")} />
+          <Input label="Last Name" placeholder="Doe" error={errors.lastName?.message} {...register("lastName")} />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Work Email</label>
-            <input
-              type="email"
-              required
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow"
-              placeholder="jane@company.com"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Phone / WhatsApp</label>
-            <input
-              required
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow"
-              placeholder="+1 234 567 8900"
-            />
-          </div>
+          <Input
+            label="Work Email"
+            type="email"
+            placeholder="jane@company.com"
+            error={errors.workEmail?.message}
+            {...register("workEmail")}
+          />
+          <Input
+            label="Phone / WhatsApp"
+            placeholder="+1 234 567 8900"
+            error={errors.phone?.message}
+            {...register("phone")}
+          />
         </div>
 
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Partnership Type</label>
-          <div className="relative">
-            <select
-              required
-              value={partnershipType}
-              onChange={(e) => setPartnershipType(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow appearance-none"
-            >
-              <option value="" disabled>
-                Select an option...
-              </option>
-              <option value="agency">Student Recruitment Agency</option>
-              <option value="university">University / Institution</option>
-              <option value="influencer">Content Creator / Influencer</option>
-              <option value="student">Student (Looking for admission)</option>
-              <option value="other">Other</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-              <ChevronDown className="w-4 h-4" />
-            </div>
-          </div>
-        </div>
+        <Select
+          label="Partnership Type"
+          options={PARTNERSHIP_TYPE_OPTIONS}
+          error={errors.partnershipType?.message}
+          {...register("partnershipType")}
+        />
 
         {partnershipType === "student" ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Degree Level</label>
-              <select
-                required
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-shadow"
-              >
-                <option value="">Select...</option>
-                <option value="bachelor">Bachelor&apos;s</option>
-                <option value="master">Master&apos;s</option>
-                <option value="phd">Ph.D.</option>
-                <option value="language">Language Program</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Intended Major</label>
-              <input
-                required
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-shadow"
-                placeholder="e.g. MBBS"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Preferred City</label>
-              <input
-                required
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-shadow"
-                placeholder="e.g. Beijing"
-              />
-            </div>
-          </div>
-        ) : (
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Company / Agency Name</label>
-            <input
-              required={partnershipType !== "student"}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow"
-              placeholder="Your Organization"
+            <Select
+              label="Degree Level"
+              options={DEGREE_LEVEL_OPTIONS}
+              error={errors.degreeLevel?.message}
+              {...register("degreeLevel")}
+            />
+            <Input
+              label="Intended Major"
+              placeholder="e.g. MBBS"
+              error={errors.intendedMajor?.message}
+              {...register("intendedMajor")}
+            />
+            <Input
+              label="Preferred City"
+              placeholder="e.g. Beijing"
+              error={errors.preferredCity?.message}
+              {...register("preferredCity")}
             />
           </div>
+        ) : (
+          <Input
+            label="Company / Agency Name"
+            placeholder="Your Organization"
+            error={errors.companyName?.message}
+            {...register("companyName")}
+          />
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Input label="Preferred Meeting Date" type="date" {...register("preferredMeetingDate")} />
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Preferred Meeting Date</label>
-            <input
-              type="date"
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Preferred Meeting Time
-              {userTimezone && <span className="text-orange-500 font-normal ml-2">({userTimezone})</span>}
-            </label>
-            <input
+            <Input
+              label={
+                userTimezone ? `Preferred Meeting Time (${userTimezone})` : "Preferred Meeting Time"
+              }
               type="time"
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow"
+              {...register("preferredMeetingTime")}
             />
             <p className="text-xs text-gray-400 mt-2">
-              Please select a time in your local timezone. We will handle the conversion to Beijing Time.
+              Please select a time in your local timezone — we&apos;ll convert it to Beijing Time for our team.
             </p>
           </div>
         </div>
@@ -179,20 +202,23 @@ export function PartnershipForm() {
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">How can we collaborate?</label>
           <textarea
-            required
             rows={4}
             className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow resize-y"
             placeholder="Tell us a bit about your organization and what you have in mind..."
+            {...register("message")}
           />
+          {errors.message && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.message.message}</p>}
         </div>
 
-        <button
+        <Button
           type="submit"
-          disabled={isSubmitting}
-          className="w-full bg-orange-600 text-white font-bold py-4 px-6 rounded-xl hover:bg-orange-700 transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-md shadow-orange-600/20"
+          variant="primary"
+          size="lg"
+          className="w-full font-bold shadow-md shadow-orange-600/20"
+          isLoading={isSubmitting}
         >
-          {isSubmitting ? "Submitting..." : "Submit Inquiry"}
-        </button>
+          Submit Inquiry
+        </Button>
       </form>
     </>
   );
