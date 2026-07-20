@@ -156,9 +156,6 @@ export default function StudentProfilePage() {
           <Card className="p-8 border border-gray-100 shadow-sm rounded-2xl min-h-[500px]">
             <FormProvider {...form}>
               <form onSubmit={handleSubmit(handleProfileSave)} className="space-y-6">
-                {/* Both tabs stay mounted (toggled via display) rather than conditionally
-                    rendered — they're fields of the same form, and switching tabs
-                    shouldn't require re-registering them. */}
                 <div className={activeTab === "General" ? "block" : "hidden"}>
                   <GeneralTab countries={countries} isSaving={isUpdatingProfile} />
                 </div>

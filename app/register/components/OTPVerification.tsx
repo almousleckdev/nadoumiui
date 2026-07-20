@@ -22,9 +22,10 @@ type OTPFormValues = z.infer<typeof otpSchema>;
 
 interface OTPVerificationProps {
   email: string;
+  showHeader?: boolean;
 }
 
-export default function OTPVerification({ email }: OTPVerificationProps) {
+export default function OTPVerification({ email, showHeader = false }: OTPVerificationProps) {
   const router = useRouter();
   const [countdown, setCountdown] = useState(60);
   const canResend = countdown === 0;
@@ -93,16 +94,18 @@ export default function OTPVerification({ email }: OTPVerificationProps) {
   }
 
   return (
-    <div className="py-6 px-4 sm:px-10">
-      <div className="text-center mb-8">
-        <h3 className="text-2xl font-bold text-gray-900 font-heading mb-2">
-          Verify your Email
-        </h3>
-        <p className="text-sm text-gray-600">
-          We&apos;ve sent a 6-digit verification code to <br />
-          <span className="font-semibold text-gray-900">{email}</span>
-        </p>
-      </div>
+    <div className="py-2 px-2 sm:px-6">
+      {showHeader && (
+        <div className="text-center mb-8">
+          <h3 className="text-2xl font-bold text-gray-900 font-heading mb-2">
+            Verify your Email
+          </h3>
+          <p className="text-sm text-gray-600">
+            We&apos;ve sent a 6-digit verification code to <br />
+            <span className="font-semibold text-gray-900">{email}</span>
+          </p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {serverError && (

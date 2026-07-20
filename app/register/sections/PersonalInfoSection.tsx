@@ -71,6 +71,7 @@ export function PersonalInfoSection({ countries }: PersonalInfoSectionProps) {
             render={({ field }) => (
               <Select
                 {...field}
+                instanceId="register-country-select"
                 options={countries}
                 value={countries.find((c) => c.label === field.value)}
                 onChange={(val) => field.onChange(val?.label)}
@@ -114,6 +115,7 @@ export function PersonalInfoSection({ countries }: PersonalInfoSectionProps) {
             render={({ field }) => (
               <Select
                 {...field}
+                instanceId="register-gender-select"
                 options={GENDER_OPTIONS}
                 value={GENDER_OPTIONS.find((o) => o.value === field.value)}
                 onChange={(val) => field.onChange(val?.value)}

@@ -14,6 +14,7 @@ import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import { TagsInput } from "@/components/ui/TagsInput";
+import { BuildingOfficeIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 
 export interface PartnerFormProps {
   initialData?: any;
@@ -49,9 +50,12 @@ export function PartnerForm({
   const form = useForm<PartnerFormValues>({
     resolver: zodResolver(partnerSchema) as any,
     defaultValues: {
+      partnerType: "university",
       status: "active",
+      country: "China",
       order: 0,
       topMajors: [],
+      servicesOffered: [],
     },
   });
 
@@ -67,10 +71,15 @@ export function PartnerForm({
 
   useEffect(() => {
     if (initialData) {
-      reset(initialData);
+      reset({
+        ...initialData,
+        partnerType: initialData.partnerType || "university",
+        country: initialData.country || (initialData.partnerType === "agency" ? "" : "China"),
+      });
     }
   }, [initialData, reset]);
 
+  const partnerType = watch("partnerType") || "university";
   const logo = watch("logo");
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,60 +120,154 @@ export function PartnerForm({
         </div>
 
         {isError && (
-          <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-sm text-red-600 font-medium">
+          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700 font-medium">
             {errorMessage || "An error occurred."}
           </div>
         )}
 
         {Object.keys(errors).length > 0 && (
-          <div className="p-4 rounded-xl bg-orange-50 border border-orange-100 text-sm text-orange-700 font-medium">
-            Please fix the validation errors below before submitting.
+          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-900 font-medium space-y-1">
+            <p className="font-bold text-red-700">Please fix the validation errors below:</p>
+            <ul className="list-disc pl-5 text-xs text-red-800">
+              {Object.entries(errors).map(([key, err]) => (
+                <li key={key}>
+                  <strong className="capitalize">{key}:</strong> {(err as any)?.message}
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 
         <form id="partnerForm" onSubmit={handleFormSubmit} className="space-y-6">
-          <Card className="border border-gray-200 bg-white p-6 space-y-6">
-            <h2 className="text-lg font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200 pb-3">
-              Institution Identity
+          {/* Partner Type Selector */}
+          <Card className="border border-slate-200 bg-white p-6 space-y-4 shadow-xs">
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3">
+              Partner Classification *
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <Input
-                label="University Name (English) *"
-                {...register("nameEn")}
-                error={errors.nameEn?.message}
-              />
-              <Input label="University Name (Chinese)" {...register("nameCn")} />
-              <Input label="Province" {...register("province")} />
-              <Input label="City" {...register("city")} />
-              <Input label="Website" placeholder="https://..." {...register("website")} error={errors.website?.message} />
-              <Input label="Display Order" type="number" {...register("order")} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setValue("partnerType", "university", { shouldValidate: true });
+                  if (!watch("country") || watch("country") === "") setValue("country", "China");
+                }}
+                className={`p-4 rounded-2xl border text-left flex items-start gap-3 transition-all ${
+                  partnerType === "university"
+                    ? "bg-slate-900 border-slate-900 text-white shadow-sm ring-2 ring-slate-900/10"
+                    : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                }`}
+              >
+                <BuildingOfficeIcon className="w-6 h-6 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-extrabold text-base block">University Partner</span>
+                  <span className={`text-xs block mt-0.5 ${partnerType === "university" ? "text-slate-300" : "text-slate-500"}`}>
+                    Academic institution offering degree and language programs.
+                  </span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setValue("partnerType", "agency", { shouldValidate: true });
+                  if (watch("country") === "China") setValue("country", "");
+                }}
+                className={`p-4 rounded-2xl border text-left flex items-start gap-3 transition-all ${
+                  partnerType === "agency"
+                    ? "bg-slate-900 border-slate-900 text-white shadow-sm ring-2 ring-slate-900/10"
+                    : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                }`}
+              >
+                <UserGroupIcon className="w-6 h-6 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-extrabold text-base block">Agency Partner</span>
+                  <span className={`text-xs block mt-0.5 ${partnerType === "agency" ? "text-slate-300" : "text-slate-500"}`}>
+                    Education recruitment agency or international representative.
+                  </span>
+                </div>
+              </button>
             </div>
           </Card>
 
-          <Card className="border border-gray-200 bg-white p-6 space-y-6">
-            <h2 className="text-lg font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200 pb-3">
-              Logo
+          {/* Identity & Location */}
+          <Card className="border border-slate-200 bg-white p-6 space-y-6 shadow-xs">
+            <h2 className="text-lg font-black text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3">
+              {partnerType === "agency" ? "Agency Identity & Location" : "University Identity & Location"}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <Input
+                label={partnerType === "agency" ? "Agency Name (English / Legal) *" : "University Name (English) *"}
+                placeholder={partnerType === "agency" ? "e.g. EduPathway Global Services" : "e.g. Sichuan University"}
+                {...register("nameEn")}
+                error={errors.nameEn?.message}
+                className="bg-slate-50 border-slate-200 text-slate-900"
+              />
+              <Input
+                label={partnerType === "agency" ? "Agency Name (Native / Chinese)" : "University Name (Chinese)"}
+                placeholder={partnerType === "agency" ? "Native business name" : "e.g. 四川大学"}
+                {...register("nameCn")}
+                className="bg-slate-50 border-slate-200 text-slate-900"
+              />
+              <Input
+                label="Country *"
+                placeholder={partnerType === "agency" ? "e.g. Nigeria, Morocco, Uzbekistan, Vietnam" : "China"}
+                {...register("country")}
+                error={errors.country?.message}
+                className="bg-slate-50 border-slate-200 text-slate-900"
+              />
+              <Input
+                label="City *"
+                placeholder="e.g. Lagos, Casablanca, Tashkent, Chengdu"
+                {...register("city")}
+                className="bg-slate-50 border-slate-200 text-slate-900"
+              />
+              <Input
+                label="Province / State"
+                placeholder="e.g. Lagos State, Sichuan"
+                {...register("province")}
+                className="bg-slate-50 border-slate-200 text-slate-900"
+              />
+              <Input
+                label="Official Website"
+                placeholder="https://..."
+                {...register("website")}
+                error={errors.website?.message}
+                className="bg-slate-50 border-slate-200 text-slate-900"
+              />
+              <Input
+                label="Display Order"
+                type="number"
+                {...register("order")}
+                className="bg-slate-50 border-slate-200 text-slate-900"
+              />
+            </div>
+          </Card>
+
+          {/* Logo / Brand Asset */}
+          <Card className="border border-slate-200 bg-white p-6 space-y-6 shadow-xs">
+            <h2 className="text-lg font-black text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3">
+              Logo &amp; Brand Emblem
             </h2>
             {logo ? (
-              <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-gray-50 h-32 w-32 flex items-center justify-center p-4">
+              <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 h-36 w-36 flex items-center justify-center p-4">
                 <Image
                   src={resolveDocumentUrl(logo)}
                   alt="Logo"
                   fill
-                  sizes="128px"
+                  sizes="144px"
                   unoptimized
-                  className="object-contain"
+                  className="object-contain p-2"
                 />
                 <button
                   type="button"
                   onClick={() => setValue("logo", "", { shouldValidate: true })}
-                  className="absolute top-2 right-2 bg-red-600 text-white rounded p-1 text-[10px]"
+                  className="absolute top-2 right-2 bg-rose-600 text-white rounded-lg p-1.5 text-[10px] font-bold shadow-xs"
                 >
                   Remove
                 </button>
               </div>
             ) : (
-              <div className="border border-dashed border-gray-200 rounded-lg p-4 text-center bg-gray-50 flex flex-col items-center justify-center h-32 w-32">
+              <div className="border border-dashed border-slate-300 rounded-2xl p-6 text-center bg-slate-50 flex flex-col items-center justify-center h-36 w-48 space-y-2">
                 <input type="file" onChange={handleLogoUpload} className="hidden" id="partner-logo-upload" accept="image/*" />
                 <Button
                   type="button"
@@ -175,58 +278,129 @@ export function PartnerForm({
                 >
                   Upload Logo
                 </Button>
+                <span className="text-[11px] text-slate-400">PNG, JPG or SVG logo</span>
               </div>
             )}
           </Card>
 
-          <Card className="border border-gray-200 bg-white p-6 space-y-6">
-            <h2 className="text-lg font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200 pb-3">
-              Academic Profile
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-              <Input label="Rank" type="number" {...register("rank")} />
-              <Input label="Total Students" type="number" {...register("totalStudents")} />
-              <Input label="Total Foreign Students" type="number" {...register("totalForeignStudents")} />
-              <Input label="Total Colleges / Schools" type="number" {...register("totalColleges")} />
-            </div>
-            <Controller
-              name="topMajors"
-              control={control}
-              render={({ field }) => (
-                <TagsInput
-                  label="Top Majors"
-                  value={field.value || []}
-                  onChange={field.onChange}
-                  placeholder="e.g. Computer Science"
+          {/* Agency-Specific Operations & Contact Details */}
+          {partnerType === "agency" ? (
+            <Card className="border border-slate-200 bg-white p-6 space-y-6 shadow-xs">
+              <h2 className="text-lg font-black text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3">
+                Agency Operations & Contact Details
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <Input
+                  label="Managing Director / Contact Person"
+                  placeholder="e.g. John Doe"
+                  {...register("contactPerson")}
+                  className="bg-slate-50 border-slate-200 text-slate-900"
                 />
-              )}
-            />
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-gray-700">Research Strengths</label>
-              <textarea
-                rows={3}
-                {...register("research")}
-                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-          </Card>
+                <Input
+                  label="Official Contact Email"
+                  placeholder="admissions@agency.com"
+                  type="email"
+                  {...register("contactEmail")}
+                  error={errors.contactEmail?.message}
+                  className="bg-slate-50 border-slate-200 text-slate-900"
+                />
+                <Input
+                  label="Phone / WhatsApp Hotline"
+                  placeholder="+234 800 000 0000"
+                  {...register("contactPhone")}
+                  className="bg-slate-50 border-slate-200 text-slate-900"
+                />
+              </div>
 
-          <Card className="border border-gray-200 bg-white p-6 space-y-6">
-            <h2 className="text-lg font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200 pb-3">
-              History &amp; Introduction
+              <Controller
+                name="servicesOffered"
+                control={control}
+                render={({ field }) => (
+                  <TagsInput
+                    label="Recruitment Services Offered"
+                    value={field.value || []}
+                    onChange={field.onChange}
+                    placeholder="e.g. Student Recruitment, Document Translation, Visa Counseling"
+                  />
+                )}
+              />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <Input
+                  label="Commission Rate / Contract Terms"
+                  placeholder="e.g. 15% per enrolled student"
+                  {...register("commissionRate")}
+                  className="bg-slate-50 border-slate-200 text-slate-900"
+                />
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-slate-700">Contract & Agreement Notes</label>
+                  <textarea
+                    rows={2}
+                    {...register("agreementNotes")}
+                    placeholder="Internal partnership terms or SLA details..."
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-800"
+                  />
+                </div>
+              </div>
+            </Card>
+          ) : (
+            /* University Academic Profile */
+            <Card className="border border-slate-200 bg-white p-6 space-y-6 shadow-xs">
+              <h2 className="text-lg font-black text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3">
+                Academic Profile
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-5">
+                <Input label="Rank" type="number" {...register("rank")} className="bg-slate-50 border-slate-200 text-slate-900" />
+                <Input label="Total Students" type="number" {...register("totalStudents")} className="bg-slate-50 border-slate-200 text-slate-900" />
+                <Input label="Total Foreign Students" type="number" {...register("totalForeignStudents")} className="bg-slate-50 border-slate-200 text-slate-900" />
+                <Input label="Total Colleges / Schools" type="number" {...register("totalColleges")} className="bg-slate-50 border-slate-200 text-slate-900" />
+              </div>
+              <Controller
+                name="topMajors"
+                control={control}
+                render={({ field }) => (
+                  <TagsInput
+                    label="Top Majors"
+                    value={field.value || []}
+                    onChange={field.onChange}
+                    placeholder="e.g. Computer Science, Clinical Medicine"
+                  />
+                )}
+              />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-slate-700">Research Strengths</label>
+                <textarea
+                  rows={3}
+                  {...register("research")}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-800"
+                />
+              </div>
+            </Card>
+          )}
+
+          {/* Profile & Overview */}
+          <Card className="border border-slate-200 bg-white p-6 space-y-6 shadow-xs">
+            <h2 className="text-lg font-black text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3">
+              {partnerType === "agency" ? "Agency Company Profile & Bio" : "University History & Introduction"}
             </h2>
             <textarea
               rows={5}
               {...register("introduction")}
-              className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              placeholder={
+                partnerType === "agency"
+                  ? "Describe the agency history, regional presence, and international student recruitment operations..."
+                  : "Institutional overview and history..."
+              }
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-800"
             />
           </Card>
 
-          <Card className="border border-gray-200 bg-white p-6 space-y-6">
-            <h2 className="text-lg font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200 pb-3">
+          {/* Status */}
+          <Card className="border border-slate-200 bg-white p-6 space-y-6 shadow-xs">
+            <h2 className="text-lg font-black text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3">
               Publish Status
             </h2>
-            <Select label="Status" {...register("status")} options={STATUS_OPTIONS} className="max-w-xs" />
+            <Select label="Status" {...register("status")} options={STATUS_OPTIONS} className="max-w-xs bg-slate-50 border-slate-200 text-slate-900" />
           </Card>
         </form>
       </div>

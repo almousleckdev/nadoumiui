@@ -37,10 +37,6 @@ export default async function ScholarshipDetailsPage({ params }: PageProps) {
   try {
     scholarship = await getScholarshipById(id);
   } catch (error) {
-    // A 404 from the backend means the scholarship genuinely doesn't exist —
-    // render Next's not-found UI. Any other failure (network, 5xx) is a real
-    // error and should surface as one via the route's error boundary, not be
-    // silently treated the same as "not found".
     if (isNotFoundError(error)) {
       notFound();
     }

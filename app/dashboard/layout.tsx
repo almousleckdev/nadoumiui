@@ -7,6 +7,7 @@ import { logoutStudent, getStudentProfile } from "@/services/authService";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import Sidebar, { SidebarLink } from "@/components/layout/Sidebar";
+import Loading from "@/components/ui/Loading";
 
 export default function StudentDashboardLayout({
   children,
@@ -33,11 +34,7 @@ export default function StudentDashboardLayout({
 
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-orange-600 border-r-2" />
-      </div>
-    );
+    return <Loading variant="page" className="min-h-screen bg-gray-50" />;
   }
 
   if (isError) {

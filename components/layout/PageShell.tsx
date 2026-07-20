@@ -9,7 +9,6 @@ interface PageShellProps {
   description?: string;
   eyebrow?: string;
   heroActions?: ReactNode;
-  /** Override the content area background, e.g. "bg-gray-50 min-h-screen". Defaults to white. */
   mainClassName?: string;
   children: ReactNode;
 }

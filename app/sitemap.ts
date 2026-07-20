@@ -22,8 +22,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(),
   }));
 
-  // Best-effort: if the backend is unreachable at build/request time, ship the
-  // sitemap with just the static routes rather than failing the whole route.
   const [scholarships, universities] = await Promise.all([
     getScholarships({ status: "published", limit: 500 }).catch(() => null),
     getUniversities({ limit: 500 }).catch(() => null),

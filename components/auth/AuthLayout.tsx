@@ -19,6 +19,7 @@ export function AuthLayout({ title, subtitle, align = "center", children }: Auth
           src="/images/hero-group.png"
           alt="Nadoumi Scholars"
           fill
+          sizes="(max-width: 1024px) 100vw, 50vw"
           className="object-cover opacity-60"
           priority
         />

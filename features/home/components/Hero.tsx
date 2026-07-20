@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Button from "@/components/ui/Button";
-import { Search, GraduationCap, School, Award } from "lucide-react";
+import { Search } from "lucide-react";
+import { HERO_STATS } from "@/data/homeData";
 
 export function Hero() {
   const router = useRouter();
@@ -79,29 +80,15 @@ export function Hero() {
 
           {/* KPI Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-3xl pt-4 border-t border-white/10">
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full bg-orange-600/20 border border-orange-500/30 flex items-center justify-center text-orange-400 mb-2">
-                <GraduationCap className="w-5 h-5" />
+            {HERO_STATS.map((stat, idx) => (
+              <div key={idx} className="flex flex-col items-center">
+                <div className="w-10 h-10 rounded-full bg-orange-600/20 border border-orange-500/30 flex items-center justify-center text-orange-400 mb-2">
+                  {stat.icon}
+                </div>
+                <span className="text-xl font-bold font-heading">{stat.value}</span>
+                <span className="text-xs text-gray-400">{stat.label}</span>
               </div>
-              <span className="text-xl font-bold font-heading">5,000+</span>
-              <span className="text-xs text-gray-400">Available Scholarships</span>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full bg-orange-600/20 border border-orange-500/30 flex items-center justify-center text-orange-400 mb-2">
-                <School className="w-5 h-5" />
-              </div>
-              <span className="text-xl font-bold font-heading">150+</span>
-              <span className="text-xs text-gray-400">Partner Universities</span>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full bg-orange-600/20 border border-orange-500/30 flex items-center justify-center text-orange-400 mb-2">
-                <Award className="w-5 h-5" />
-              </div>
-              <span className="text-xl font-bold font-heading">98%</span>
-              <span className="text-xs text-gray-400">Visa & Admission Success</span>
-            </div>
+            ))}
           </div>
         </div>
       </div>

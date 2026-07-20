@@ -67,29 +67,50 @@ export function PublishTab({ isCoverUploading, onImageUpload }: PublishTabProps)
         />
 
         <div className="flex flex-col gap-4 mt-4">
-          <label className="flex items-center gap-3 cursor-pointer p-3 bg-gray-50 border border-gray-200 rounded-lg">
-            <input
-              type="checkbox"
-              {...register("isHot")}
-              className="h-5 w-5 rounded border-gray-200 bg-white text-orange-600 focus:ring-orange-500"
-            />
-            <span className="text-sm font-bold text-gray-900">Hot Selection (High Demand)</span>
-          </label>
-          <label className="flex items-center gap-3 cursor-pointer p-3 bg-gray-50 border border-gray-200 rounded-lg">
+          <label className="flex items-start gap-3 cursor-pointer p-4 bg-slate-50 border border-slate-200 rounded-2xl transition-all hover:bg-slate-100/80">
             <input
               type="checkbox"
               {...register("isRecommended")}
-              className="h-5 w-5 rounded border-gray-200 bg-white text-orange-600 focus:ring-orange-500"
+              className="h-5 w-5 mt-0.5 rounded border-slate-300 text-slate-900 focus:ring-slate-800 shrink-0"
             />
-            <span className="text-sm font-bold text-gray-900">Nadoumi Recommended</span>
+            <div>
+              <span className="text-sm font-extrabold text-slate-900 block">
+                Featured Scholarship (Nadoumi Recommended)
+              </span>
+              <span className="text-xs text-slate-500 font-medium block mt-0.5">
+                Displays this scholarship prominently in the &quot;Featured Scholarships&quot; carousel on the homepage and top listings.
+              </span>
+            </div>
           </label>
-          <label className="flex items-center gap-3 cursor-pointer p-3 bg-gray-50 border border-gray-200 rounded-lg">
+          <label className="flex items-start gap-3 cursor-pointer p-4 bg-slate-50 border border-slate-200 rounded-2xl transition-all hover:bg-slate-100/80">
+            <input
+              type="checkbox"
+              {...register("isHot")}
+              className="h-5 w-5 mt-0.5 rounded border-slate-300 text-slate-900 focus:ring-slate-800 shrink-0"
+            />
+            <div>
+              <span className="text-sm font-extrabold text-slate-900 block">
+                Hot Program (High Student Demand)
+              </span>
+              <span className="text-xs text-slate-500 font-medium block mt-0.5">
+                Adds a &quot;High Demand&quot; flame badge to the scholarship card.
+              </span>
+            </div>
+          </label>
+          <label className="flex items-start gap-3 cursor-pointer p-4 bg-slate-50 border border-slate-200 rounded-2xl transition-all hover:bg-slate-100/80">
             <input
               type="checkbox"
               {...register("isTop")}
-              className="h-5 w-5 rounded border-gray-200 bg-white text-orange-600 focus:ring-orange-500"
+              className="h-5 w-5 mt-0.5 rounded border-slate-300 text-slate-900 focus:ring-slate-800 shrink-0"
             />
-            <span className="text-sm font-bold text-gray-900">Top Tier Program</span>
+            <div>
+              <span className="text-sm font-extrabold text-slate-900 block">
+                Top Tier Institution Program
+              </span>
+              <span className="text-xs text-slate-500 font-medium block mt-0.5">
+                Adds a &quot;Top Pick&quot; badge to the scholarship card.
+              </span>
+            </div>
           </label>
         </div>
       </Card>

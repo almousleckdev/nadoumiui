@@ -51,7 +51,7 @@ export default function CityGuidesClient() {
       description="China's major study destinations, province by province — with the top universities and a look at each city."
     >
       <div className="space-y-16">
-        {/* ── SEARCH ─────────────────────────────────────────── */}
+        {/*SEARCH*/}
         <div>
           <div className="max-w-xl">
             <Input
@@ -134,7 +134,7 @@ export default function CityGuidesClient() {
           )}
         </div>
 
-        {/* ── CITY TIERS ─────────────────────────────────────────── */}
+        {/*CITY TIERS */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Understanding City Tiers</h2>
           <p className="text-gray-600 leading-relaxed mb-8 max-w-4xl">

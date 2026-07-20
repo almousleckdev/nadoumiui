@@ -21,8 +21,8 @@ export default function AdminDashboardLayout({
   const { isLoading, isError } = useQuery({
     queryKey: ["adminProfile"],
     queryFn: getAdminProfile,
-    retry: false, // Do not retry on auth failures, redirect immediately
-    staleTime: 5 * 60 * 1000, // cache for 5 minutes
+    retry: false,
+    staleTime: 5 * 60 * 1000,
   });
 
   // Authentication Guard for Admins
@@ -48,7 +48,6 @@ export default function AdminDashboardLayout({
     return <Loading variant="page" className="min-h-screen bg-gray-50" />;
   }
 
-  // If there's an error, the useEffect above will redirect, but we can also return null or loading to avoid flash
   if (isError) {
     return null;
   }

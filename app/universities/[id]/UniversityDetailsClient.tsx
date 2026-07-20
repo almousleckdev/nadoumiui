@@ -131,7 +131,14 @@ export default function UniversityDetailsClient({
             />
             <MetricCard
               label="Degree Programs"
-              value={university.numberOfPrograms?.toLocaleString() || "N/A"}
+              value={
+                (university.numberOfPrograms && university.numberOfPrograms > 0
+                  ? university.numberOfPrograms
+                  : Array.isArray(university.majors) && university.majors.length > 0
+                  ? university.majors.length
+                  : undefined
+                )?.toLocaleString() || "N/A"
+              }
               icon={<AcademicCapIcon className="w-6 h-6" />}
             />
             <MetricCard

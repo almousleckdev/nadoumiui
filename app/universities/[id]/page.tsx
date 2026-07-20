@@ -44,11 +44,7 @@ export default async function UniversityDetailsPage({ params }: PageProps) {
     }
     throw error;
   }
-
-  // Related scholarships genuinely depend on the university's name, so this
-  // can't be parallelized with the university fetch itself — but doing both
-  // fetches here (server-to-server) instead of as two sequential client-side
-  // round trips removes a full network hop's worth of latency for the user.
+  
   const scholarshipsData = await getScholarships({ search: university.name, limit: 3 }).catch(
     () => ({ scholarships: [], total: 0, page: 1, limit: 3, totalPages: 0 }),
   );

@@ -10,7 +10,7 @@ export default function StudentVisaPage() {
     >
       <div className="space-y-16">
         
-        {/* ── VISA TYPES ─────────────────────────────────────────── */}
+        {/* VISA TYPES */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Types of Student Visas</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -42,7 +42,7 @@ export default function StudentVisaPage() {
           </div>
         </div>
 
-        {/* ── REQUIRED DOCUMENTS ─────────────────────────────────────────── */}
+        {/*REQUIRED DOCUMENTS*/}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Required Documentation</h2>
           <div className="bg-slate-50 border border-gray-200 rounded-2xl p-8 max-w-4xl">

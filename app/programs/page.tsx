@@ -11,12 +11,11 @@ import ErrorState from "@/components/ui/ErrorState";
 import EmptyState from "@/components/ui/EmptyState";
 import type { ProgramCategory } from "@/types";
 
+import { PROGRAM_LEVEL_OPTIONS } from "@/data/optionsData";
+
 const CATEGORY_OPTIONS = [
   { value: "", label: "All Levels" },
-  { value: "Language", label: "Language" },
-  { value: "Bachelor", label: "Bachelor" },
-  { value: "Master", label: "Master" },
-  { value: "PhD", label: "PhD" },
+  ...PROGRAM_LEVEL_OPTIONS.map((opt) => ({ value: opt.value, label: opt.value })),
 ];
 
 export default function ProgramsPage() {

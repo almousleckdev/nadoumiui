@@ -81,6 +81,7 @@ export const universitySchema = z.object({
   qsRank: z.coerce.number().int().optional().nullable(),
   isRecommended: z.coerce.boolean().optional(),
   isPartner: z.coerce.boolean().optional(),
+  partnerId: z.string().optional(),
   isTop: z.coerce.boolean().optional(),
   recommendationNotes: z.string().optional(),
   

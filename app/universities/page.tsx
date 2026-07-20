@@ -11,20 +11,16 @@ import ErrorState from "@/components/ui/ErrorState";
 import EmptyState from "@/components/ui/EmptyState";
 import type { UniversityType } from "@/types";
 
-const PROVINCE_OPTIONS = [
+import { PROVINCE_OPTIONS, UNIVERSITY_TYPE_OPTIONS } from "@/data/optionsData";
+
+const PROVINCE_FILTER_OPTIONS = [
   { value: "", label: "All Locations" },
-  { value: "Beijing", label: "Beijing" },
-  { value: "Shanghai", label: "Shanghai" },
-  { value: "Zhejiang", label: "Zhejiang" },
-  { value: "Sichuan", label: "Sichuan" },
-  { value: "Guangdong", label: "Guangdong" },
-  { value: "Jiangsu", label: "Jiangsu" },
+  ...PROVINCE_OPTIONS,
 ];
 
-const TYPE_OPTIONS = [
+const TYPE_FILTER_OPTIONS = [
   { value: "", label: "All Types" },
-  { value: "Public", label: "Public" },
-  { value: "Private", label: "Private" },
+  ...UNIVERSITY_TYPE_OPTIONS,
 ];
 
 export default function UniversitiesPage() {
@@ -57,7 +53,7 @@ export default function UniversitiesPage() {
             {
               key: "province",
               label: "Province",
-              options: PROVINCE_OPTIONS,
+              options: PROVINCE_FILTER_OPTIONS,
               value: province,
               onChange: (val) => {
                 setProvince(val);
@@ -67,7 +63,7 @@ export default function UniversitiesPage() {
             {
               key: "type",
               label: "Type",
-              options: TYPE_OPTIONS,
+              options: TYPE_FILTER_OPTIONS,
               value: type,
               onChange: (val) => {
                 setType(val as UniversityType | "");

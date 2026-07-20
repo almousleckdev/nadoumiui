@@ -32,6 +32,7 @@ export default function ContactForm() {
   const onSubmit = async (data: ContactFormValues) => {
     try {
       await submitContactInquiry(data);
+      reset();
     } catch (err) {
       toast.error(getErrorMessage(err, "Failed to send your message. Please try again."));
       throw err;

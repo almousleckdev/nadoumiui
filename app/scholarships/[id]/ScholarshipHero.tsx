@@ -46,6 +46,14 @@ export function ScholarshipHero({ scholarship, deadlineStr }: { scholarship: Sch
             )}
 
             <div className="flex flex-wrap items-center gap-6 text-blue-100 font-medium">
+              {scholarship.locations?.[0] && (
+                <div className="flex items-center gap-2 bg-blue-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-blue-400/20">
+                  <ClockIcon className="w-5 h-5 text-orange-400 hidden" />
+                  <span className="text-white font-bold flex items-center gap-1.5">
+                    📍 {scholarship.locations[0].city ? `${scholarship.locations[0].city}, ` : ""}{scholarship.locations[0].province || "China"}
+                  </span>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <ClockIcon className="w-5 h-5 text-orange-400" />
                 <span>
@@ -55,7 +63,7 @@ export function ScholarshipHero({ scholarship, deadlineStr }: { scholarship: Sch
               <div className="flex items-center gap-2">
                 <AcademicCapIcon className="w-5 h-5 text-green-400" />
                 <span>
-                  Levels: <strong className="text-white">{scholarship.programCategories.join(", ")}</strong>
+                  Levels: <strong className="text-white">{scholarship.programCategories?.join(", ") || "Bachelor"}</strong>
                 </span>
               </div>
             </div>

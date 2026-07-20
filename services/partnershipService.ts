@@ -8,6 +8,7 @@ export interface PartnershipInquiryPayload {
   lastName: string;
   workEmail: string;
   phone: string;
+  country?: string;
   partnershipType: PartnershipType;
   companyName?: string;
   degreeLevel?: string;

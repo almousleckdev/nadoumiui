@@ -64,6 +64,13 @@ export function FinancialsTab() {
             {...register("insurance")}
             className="bg-gray-50 border-gray-200 text-gray-900"
           />
+          <Input
+            label="Visa Fee (RMB)"
+            placeholder="e.g. 400"
+            type="number"
+            {...register("visaFee")}
+            className="bg-gray-50 border-gray-200 text-gray-900"
+          />
         </div>
 
         <div className="flex flex-col gap-1.5 mt-4">

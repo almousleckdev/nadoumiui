@@ -1,43 +1,7 @@
 import React from 'react';
 import PageShell from '@/components/layout/PageShell';
-import { Train, Smartphone, Bike, QrCode, PartyPopper, Moon, Flag, Sailboat } from 'lucide-react';
-
 import { livingExpenses as expenses } from '@/data/guides';
-
-const transportOptions = [
-  { icon: Train, label: 'Metro & High-Speed Rail' },
-  { icon: Smartphone, label: 'Didi (Ride-Hailing)' },
-  { icon: Bike, label: 'Shared Bikes (Meituan/Hello)' },
-  { icon: QrCode, label: 'QR-Code Payment on Transit' },
-];
-
-const festivals = [
-  {
-    icon: PartyPopper,
-    name: 'Spring Festival',
-    timing: 'Late Jan – Feb',
-    description:
-      "China's biggest holiday. Most campuses close for 2–4 weeks and the whole country travels home — book early or explore while it's quiet.",
-  },
-  {
-    icon: Moon,
-    name: 'Mid-Autumn Festival',
-    timing: 'September / October',
-    description: 'A family reunion holiday centered on mooncakes and moon-viewing — many campuses host their own celebrations.',
-  },
-  {
-    icon: Flag,
-    name: 'National Day (Golden Week)',
-    timing: 'Oct 1 – Oct 7',
-    description: 'A week-long national holiday — one of the best windows for students to travel domestically.',
-  },
-  {
-    icon: Sailboat,
-    name: 'Dragon Boat Festival',
-    timing: 'May / June',
-    description: 'Marked by dragon boat races and sticky rice dumplings (zongzi) — a fun, low-key campus tradition.',
-  },
-];
+import { TRANSPORT_OPTIONS, FESTIVALS } from '@/data/livingInChinaData';
 
 export default function LivingInChinaPage() {
   return (
@@ -47,7 +11,7 @@ export default function LivingInChinaPage() {
     >
       <div className="max-w-4xl mx-auto space-y-16">
 
-        {/* ── COST OF LIVING ─────────────────────────────────────────── */}
+        {/*COST OF LIVING */}
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Cost of Living</h2>
           <p className="text-gray-600 leading-relaxed mb-8">
@@ -82,7 +46,7 @@ export default function LivingInChinaPage() {
           </div>
         </div>
 
-        {/* ── GETTING AROUND: TRANSPORTATION ─────────────────────────────────────────── */}
+        {/* GETTING AROUND: TRANSPORTATION */}
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Getting Around: Transportation</h2>
           <div className="bg-slate-50 border border-gray-200 rounded-2xl p-8 text-left">
@@ -94,7 +58,7 @@ export default function LivingInChinaPage() {
               so setting up mobile payments in your first week will make getting around effortless.
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
-              {transportOptions.map(({ icon: Icon, label }) => (
+              {TRANSPORT_OPTIONS.map(({ icon: Icon, label }) => (
                 <span
                   key={label}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 shadow-sm"
@@ -107,7 +71,7 @@ export default function LivingInChinaPage() {
           </div>
         </div>
 
-        {/* ── CULTURE & INTEGRATION ─────────────────────────────────────────── */}
+        {/*CULTURE & INTEGRATION */}
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Culture & Integration</h2>
           <div className="prose prose-orange text-gray-600 mx-auto text-left">
@@ -122,7 +86,7 @@ export default function LivingInChinaPage() {
           </div>
         </div>
 
-        {/* ── FESTIVALS & CULTURE ─────────────────────────────────────────── */}
+        {/* FESTIVALS & CULTURE */}
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Festivals & Culture</h2>
           <p className="text-gray-600 leading-relaxed mb-8">
@@ -130,7 +94,7 @@ export default function LivingInChinaPage() {
             a rare chance to travel, so it&apos;s worth planning your semester around them.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left">
-            {festivals.map(({ icon: Icon, name, timing, description }) => (
+            {FESTIVALS.map(({ icon: Icon, name, timing, description }) => (
               <div key={name} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-9 h-9 rounded-lg bg-orange-50 border border-orange-100 text-orange-600 flex items-center justify-center shrink-0">
@@ -147,7 +111,7 @@ export default function LivingInChinaPage() {
           </div>
         </div>
 
-        {/* ── DIGITAL LIFE ─────────────────────────────────────────── */}
+        {/* DIGITAL LIFE */}
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">The Digital Ecosystem</h2>
           <div className="bg-slate-50 border border-gray-200 rounded-2xl p-8 text-left">

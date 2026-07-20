@@ -1,40 +1,10 @@
 import Button from "@/components/ui/Button";
 import Link from "next/link";
-import { GraduationCap, Globe, Lightbulb, Compass, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import SectionHeader from "@/components/ui/SectionHeader";
+import { WHY_CHOOSE_US_FEATURES, WHY_CHOOSE_US_BULLETS } from "@/data/homeData";
 
 export function WhyChooseUs() {
-  const features = [
-    {
-      title: "Affordable Excellence",
-      description: "Access world-class higher education at a fraction of Western costs, backed by generous full and partial scholarship structures.",
-      icon: (
-        <GraduationCap className="w-6 h-6" />
-      ),
-    },
-    {
-      title: "Global Career Gateway",
-      description: "Build robust connections with China's tech and industrial giants, opening up unmatched international and domestic career channels.",
-      icon: (
-        <Globe className="w-6 h-6" />
-      ),
-    },
-    {
-      title: "Innovation Hub",
-      description: "Learn in state-of-the-art campus laboratories, engaging directly with artificial intelligence, clean energy, and advanced hardware.",
-      icon: (
-        <Lightbulb className="w-6 h-6" />
-      ),
-    },
-    {
-      title: "Cultural Immersion",
-      description: "Experience a perfect blend of ancient heritage and modern convenience, learning Mandarin along the way for high-value fluency.",
-      icon: (
-        <Compass className="w-6 h-6" />
-      ),
-    },
-  ];
-
   return (
     <section className="py-24 bg-gray-50 border-y border-gray-100">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -42,7 +12,7 @@ export function WhyChooseUs() {
           
           {/* Left Column: 2x2 Feature Grid */}
           <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8">
-            {features.map((feature, idx) => (
+            {WHY_CHOOSE_US_FEATURES.map((feature, idx) => (
               <div 
                 key={idx} 
                 className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
@@ -71,12 +41,7 @@ export function WhyChooseUs() {
             />
 
             <ul className="space-y-4 mb-8 text-sm text-gray-700 font-medium">
-              {[
-                "Direct partnership with top-tier double first-class Chinese universities.",
-                "Professional counseling with 98% application & visa success rates.",
-                "End-to-end guidance from university selection to campus arrival.",
-                "Bilingual support desk handling all document translating and certification."
-              ].map((bullet, idx) => (
+              {WHY_CHOOSE_US_BULLETS.map((bullet, idx) => (
                 <li key={idx} className="flex items-start gap-3">
                   <span className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
                     <Check className="w-3 h-3" strokeWidth={3} />

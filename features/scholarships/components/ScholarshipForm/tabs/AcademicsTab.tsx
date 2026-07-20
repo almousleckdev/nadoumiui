@@ -95,8 +95,8 @@ function ProgramsAndMajorsSection() {
         </Button>
       </div>
 
-      <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100 font-medium">
-        <strong className="text-white font-bold">Program Rules:</strong> Bachelor, Master, and PhD programs require one or more assigned majors. Language programs do not have majors.
+      <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 font-medium">
+        <strong>Program Rules:</strong> Bachelor, Master, and PhD programs must have one or more assigned majors. Language programs do not have majors.
       </div>
 
       {fields.length === 0 ? (

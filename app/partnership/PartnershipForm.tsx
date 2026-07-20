@@ -1,33 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useId } from "react";
 import { Check } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "react-hot-toast";
+import countryList from "react-select-country-list";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import ReactSelect from "react-select";
+
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import Button from "@/components/ui/Button";
 import { submitPartnershipInquiry, type PartnershipType } from "@/services/partnershipService";
 import { getErrorMessage } from "@/utils/getErrorMessage";
-
-const PARTNERSHIP_TYPE_OPTIONS = [
-  { value: "", label: "Select an option..." },
-  { value: "agency", label: "Student Recruitment Agency" },
-  { value: "university", label: "University / Institution" },
-  { value: "influencer", label: "Content Creator / Influencer" },
-  { value: "student", label: "Student (Looking for admission)" },
-  { value: "other", label: "Other" },
-];
-
-const DEGREE_LEVEL_OPTIONS = [
-  { value: "", label: "Select..." },
-  { value: "bachelor", label: "Bachelor's" },
-  { value: "master", label: "Master's" },
-  { value: "phd", label: "Ph.D." },
-  { value: "language", label: "Language Program" },
-];
+import { PARTNERSHIP_TYPE_OPTIONS, DEGREE_LEVEL_OPTIONS } from "@/data/partnershipData";
 
 const partnershipSchema = z
   .object({
@@ -35,6 +24,7 @@ const partnershipSchema = z
     lastName: z.string().min(1, "Last name is required"),
     workEmail: z.string().min(1, "Email is required").email("Please enter a valid email address"),
     phone: z.string().min(1, "Phone number is required"),
+    country: z.string().min(1, "Country is required"),
     partnershipType: z.string().min(1, "Please select a partnership type"),
     companyName: z.string().optional(),
     degreeLevel: z.string().optional(),
@@ -64,20 +54,26 @@ type PartnershipFormValues = z.infer<typeof partnershipSchema>;
 
 export function PartnershipForm() {
   const [userTimezone, setUserTimezone] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
+  const countrySelectId = useId();
+  const countries = useMemo(() => countryList().getData(), []);
+
   const {
     register,
     handleSubmit,
+    control,
     watch,
     reset,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = useForm<PartnershipFormValues>({
     resolver: zodResolver(partnershipSchema),
-    defaultValues: { partnershipType: "" },
+    defaultValues: { partnershipType: "", phone: "", country: "" },
   });
 
   const partnershipType = watch("partnershipType");
 
   useEffect(() => {
+    setIsMounted(true);
     setUserTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone);
   }, []);
 
@@ -88,6 +84,7 @@ export function PartnershipForm() {
         lastName: data.lastName,
         workEmail: data.workEmail,
         phone: data.phone,
+        country: data.country,
         partnershipType: data.partnershipType as PartnershipType,
         companyName: data.companyName || undefined,
         degreeLevel: data.partnershipType === "student" ? data.degreeLevel || undefined : undefined,
@@ -98,6 +95,7 @@ export function PartnershipForm() {
         timezone: userTimezone || undefined,
         message: data.message,
       });
+      reset();
     } catch (err) {
       toast.error(getErrorMessage(err, "Failed to submit your inquiry. Please try again."));
       throw err;
@@ -126,28 +124,64 @@ export function PartnershipForm() {
     <>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input label="First Name" placeholder="Jane" error={errors.firstName?.message} {...register("firstName")} />
-          <Input label="Last Name" placeholder="Doe" error={errors.lastName?.message} {...register("lastName")} />
+          <Input label="First Name *" placeholder="Jane" error={errors.firstName?.message} {...register("firstName")} />
+          <Input label="Last Name *" placeholder="Doe" error={errors.lastName?.message} {...register("lastName")} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input
-            label="Work Email"
-            type="email"
-            placeholder="jane@company.com"
-            error={errors.workEmail?.message}
-            {...register("workEmail")}
-          />
-          <Input
-            label="Phone / WhatsApp"
-            placeholder="+1 234 567 8900"
-            error={errors.phone?.message}
-            {...register("phone")}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-1">
+            <Input
+              label="Work Email *"
+              type="email"
+              placeholder="jane@company.com"
+              error={errors.workEmail?.message}
+              {...register("workEmail")}
+            />
+          </div>
+
+          <div className="md:col-span-1">
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Phone *</label>
+            <Controller
+              name="phone"
+              control={control}
+              render={({ field }) => (
+                <PhoneInput
+                  {...field}
+                  international
+                  defaultCountry="US"
+                  className={`flex h-11 w-full rounded-xl border bg-white px-3 py-2 text-sm transition-all focus-within:ring-2 focus-within:ring-orange-600/20 focus-within:border-orange-600 ${
+                    errors.phone ? "border-red-500" : "border-gray-200 hover:border-gray-300"
+                  }`}
+                />
+              )}
+            />
+            {errors.phone && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.phone.message}</p>}
+          </div>
+
+          <div className="md:col-span-1">
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Country *</label>
+            <Controller
+              name="country"
+              control={control}
+              render={({ field }) => (
+                <ReactSelect
+                  {...field}
+                  instanceId={countrySelectId}
+                  options={countries}
+                  value={countries.find((c) => c.label === field.value)}
+                  onChange={(val) => field.onChange(val?.label)}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                  placeholder="Select Country"
+                />
+              )}
+            />
+            {errors.country && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.country.message}</p>}
+          </div>
         </div>
 
         <Select
-          label="Partnership Type"
+          label="Partnership Type *"
           options={PARTNERSHIP_TYPE_OPTIONS}
           error={errors.partnershipType?.message}
           {...register("partnershipType")}
@@ -156,19 +190,19 @@ export function PartnershipForm() {
         {partnershipType === "student" ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Select
-              label="Degree Level"
+              label="Degree Level *"
               options={DEGREE_LEVEL_OPTIONS}
               error={errors.degreeLevel?.message}
               {...register("degreeLevel")}
             />
             <Input
-              label="Intended Major"
+              label="Intended Major *"
               placeholder="e.g. MBBS"
               error={errors.intendedMajor?.message}
               {...register("intendedMajor")}
             />
             <Input
-              label="Preferred City"
+              label="Preferred City *"
               placeholder="e.g. Beijing"
               error={errors.preferredCity?.message}
               {...register("preferredCity")}
@@ -176,7 +210,7 @@ export function PartnershipForm() {
           </div>
         ) : (
           <Input
-            label="Company / Agency Name"
+            label="Company / Agency Name *"
             placeholder="Your Organization"
             error={errors.companyName?.message}
             {...register("companyName")}
@@ -188,7 +222,7 @@ export function PartnershipForm() {
           <div>
             <Input
               label={
-                userTimezone ? `Preferred Meeting Time (${userTimezone})` : "Preferred Meeting Time"
+                isMounted && userTimezone ? `Preferred Meeting Time (${userTimezone})` : "Preferred Meeting Time"
               }
               type="time"
               {...register("preferredMeetingTime")}
@@ -200,7 +234,7 @@ export function PartnershipForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">How can we collaborate?</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">How can we collaborate? *</label>
           <textarea
             rows={4}
             className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow resize-y"

@@ -71,8 +71,11 @@ export default function StudentRegisterPage() {
 
   if (registeredEmail) {
     return (
-      <AuthLayout title="Verify Your Account" subtitle="Check your email for the OTP">
-        <OTPVerification email={registeredEmail} />
+      <AuthLayout 
+        title="Verify Your Account" 
+        subtitle={`Enter the 6-digit verification code sent to ${registeredEmail}`}
+      >
+        <OTPVerification email={registeredEmail} showHeader={false} />
       </AuthLayout>
     );
   }

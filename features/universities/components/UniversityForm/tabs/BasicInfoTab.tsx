@@ -1,21 +1,141 @@
+import { useState, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
 import type { UniversityFormValues } from "@/lib/validations/university";
+import { getPartners } from "@/services/partnerService";
+import type { Partner } from "@/types";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import { INSTITUTION_TYPE_OPTIONS } from "../constants";
+import { Sparkles, Building2 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export function BasicInfoTab() {
   const {
     register,
+    watch,
+    setValue,
     formState: { errors },
   } = useFormContext<UniversityFormValues>();
+
+  const isPartner = watch("isPartner");
+  const partnerId = watch("partnerId");
+
+  const [selectedPartnerId, setSelectedPartnerId] = useState<string>(partnerId || "");
+
+  // Fetch partners list
+  const { data: partnersData, isLoading: isPartnersLoading } = useQuery({
+    queryKey: ["adminPartnersList"],
+    queryFn: () => getPartners({ limit: 100 }),
+  });
+
+  const partners: Partner[] = partnersData?.partners || [];
+
+  // Handle Partner Selection and Auto-Populate Fields
+  const handlePartnerSelect = (pId: string) => {
+    setSelectedPartnerId(pId);
+    setValue("partnerId", pId, { shouldValidate: true });
+
+    const partner = partners.find((item) => item.id === pId);
+    if (!partner) return;
+
+    // Institution Identity
+    if (partner.nameEn) setValue("name", partner.nameEn, { shouldValidate: true });
+    if (partner.nameCn) setValue("nameInChinese", partner.nameCn, { shouldValidate: true });
+    if (partner.city) setValue("city", partner.city, { shouldValidate: true });
+    if (partner.province) setValue("province", partner.province, { shouldValidate: true });
+    if (partner.website) setValue("officialWebsite", partner.website, { shouldValidate: true });
+
+    // Logo
+    if (partner.logo) setValue("logo", partner.logo, { shouldValidate: true });
+
+    // Academic Profile
+    if (partner.rank !== undefined && partner.rank !== null) setValue("qsRank", partner.rank, { shouldValidate: true });
+    if (partner.totalStudents) setValue("totalStudents", partner.totalStudents, { shouldValidate: true });
+    if (partner.totalForeignStudents) setValue("internationalStudents", partner.totalForeignStudents, { shouldValidate: true });
+    if (partner.totalColleges) setValue("numberOfPrograms", partner.totalColleges, { shouldValidate: true });
+    if (partner.topMajors && partner.topMajors.length > 0) setValue("advantages", partner.topMajors, { shouldValidate: true });
+
+    // History & Introduction
+    if (partner.introduction) setValue("introduction", partner.introduction, { shouldValidate: true });
+    if (partner.research || partner.introduction) setValue("description", (partner.research || partner.introduction)!, { shouldValidate: true });
+
+    // Publish Status
+    if (partner.status) setValue("status", partner.status as any, { shouldValidate: true });
+    setValue("isPartner", true, { shouldValidate: true });
+
+    toast.success(`Populated university details from "${partner.nameEn}"!`);
+  };
 
   return (
     <Card className="border border-gray-200 bg-white p-6 space-y-6">
       <h2 className="text-lg font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200 pb-3">
         Core Identities & Academic Standing
       </h2>
+
+      {/* Partner Integration Section */}
+      <div className="bg-gradient-to-r from-orange-50/80 via-amber-50/50 to-orange-50/30 border border-orange-200/80 rounded-xl p-5 space-y-4 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <Building2 className="w-5 h-5 text-orange-600" />
+            <div>
+              <h3 className="text-sm font-bold text-gray-900">Partner Integration</h3>
+              <p className="text-xs text-gray-500">
+                Link this university to an existing partner record to automatically reuse identity, logo, and academic data.
+              </p>
+            </div>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              className="sr-only peer"
+              checked={Boolean(isPartner)}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setValue("isPartner", checked, { shouldValidate: true });
+                if (!checked) {
+                  setValue("partnerId", "", { shouldValidate: true });
+                  setSelectedPartnerId("");
+                }
+              }}
+            />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+            <span className="ml-3 text-sm font-bold text-gray-900">Is Partner</span>
+          </label>
+        </div>
+
+        {isPartner && (
+          <div className="pt-2 border-t border-orange-200/60 space-y-3">
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+              Select Partner Institution / Agency
+            </label>
+            <select
+              value={selectedPartnerId}
+              onChange={(e) => handlePartnerSelect(e.target.value)}
+              disabled={isPartnersLoading}
+              className="w-full rounded-lg border border-orange-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-sm"
+            >
+              <option value="">-- Choose Existing Partner --</option>
+              {partners.map((partner) => (
+                <option key={partner.id} value={partner.id}>
+                  {partner.nameEn} {partner.city ? `(${partner.city})` : ""} - [{partner.status.toUpperCase()}]
+                </option>
+              ))}
+            </select>
+
+            {selectedPartnerId && (
+              <div className="flex items-center gap-2 text-xs font-semibold text-orange-700 bg-orange-100/60 rounded-lg px-3 py-2 border border-orange-200">
+                <Sparkles className="w-4 h-4 text-orange-600 shrink-0" />
+                <span>
+                  University fields automatically synchronized with selected Partner. You can still modify any field if needed.
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <Input
           label="University ID * (Unique)"

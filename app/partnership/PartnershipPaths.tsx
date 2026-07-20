@@ -1,38 +1,4 @@
-import { Users, Building2, Video, GraduationCap, type LucideIcon } from "lucide-react";
-
-interface PartnershipPath {
-  icon: LucideIcon;
-  title: string;
-  bestFor: string;
-  description: string;
-}
-
-const PATHS: PartnershipPath[] = [
-  {
-    icon: Users,
-    title: "Recruitment Agencies",
-    bestFor: "Best for agencies & counselors",
-    description: "Refer students into our partner programs and earn competitive commissions on successful placements.",
-  },
-  {
-    icon: Building2,
-    title: "Universities & Institutions",
-    bestFor: "Best for admissions offices",
-    description: "Expand your international student pipeline through a dedicated pathway with our advisory network.",
-  },
-  {
-    icon: Video,
-    title: "Content Creators",
-    bestFor: "Best for education creators",
-    description: "Collaborate on scholarship guides, campus tours, and study-abroad content for our student audience.",
-  },
-  {
-    icon: GraduationCap,
-    title: "Prospective Students",
-    bestFor: "Best for direct applicants",
-    description: "Not a partnership, but the same door — tell us your goals and we'll match you with the right program.",
-  },
-];
+import { PARTNERSHIP_PATHS } from "@/data/partnershipData";
 
 export function PartnershipPaths() {
   return (
@@ -49,7 +15,7 @@ export function PartnershipPaths() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {PATHS.map(({ icon: Icon, title, bestFor, description }) => (
+        {PARTNERSHIP_PATHS.map(({ icon: Icon, title, bestFor, description }) => (
           <div
             key={title}
             className="group bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"

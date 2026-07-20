@@ -3,7 +3,7 @@ import { z } from "zod";
 export const scholarshipSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   titleInChinese: z.string().optional(),
-  universities: z.array(z.string().uuid("Invalid University ID")).optional(),
+  universities: z.array(z.string()).optional(),
   description: z.string().min(10, "Description must be at least 10 characters"),
   programCategories: z.array(z.enum(["Language", "Bachelor", "Master", "PhD"])),
   scholarshipCategory: z.enum([
@@ -57,18 +57,49 @@ export const scholarshipSchema = z.object({
   nadoumiServiceFee: z.coerce.number().nonnegative().optional(),
   nadoumiFeeCurrency: z.enum(["RMB", "USD"]).default("USD").optional(),
 
-  stipend: z.string().optional(),
+  hasStipend: z.coerce.boolean().optional().default(false),
+  stipend: z.union([z.string(), z.record(z.string(), z.any()), z.array(z.any())]).optional(),
+  programSelection: z
+    .union([
+      z.array(
+        z.object({
+          programType: z.enum(["Language", "Bachelor", "Master", "PhD"]),
+          majors: z.array(z.string()).optional(),
+          stipendAmount: z.coerce.number().optional().nullable(),
+          stipendUnit: z.string().optional().nullable(),
+        })
+      ),
+      z.record(
+        z.string(),
+        z.object({
+          majors: z.array(z.string()).optional(),
+          stipendAmount: z.coerce.number().optional().nullable(),
+          stipendUnit: z.string().optional().nullable(),
+        })
+      ),
+    ])
+    .optional(),
+
   accommodationFee: z.string().optional(),
-  applicationDocuments: z.string().optional(),
+  applicationDocuments: z.any().optional(),
   requirements: z.string().optional(),
-  benefits: z.string().optional(),
+  benefits: z.union([z.array(z.string()), z.string()]).optional(),
   applicantRequirements: z.string().optional(),
-  additionalDocuments: z.string().optional(),
+  additionalDocuments: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Document name is required"),
+        required: z.coerce.boolean().default(true),
+        notes: z.string().optional(),
+      })
+    )
+    .optional(),
   feeStructure: z.string().optional(),
   additionalFees: z.string().optional(),
 
   // Miscellaneous
   insurance: z.string().optional(),
+  visaFee: z.coerce.number().nonnegative().optional(),
   teachingLanguage: z.enum(["English", "Chinese", "Both"]).default("English"),
   isRecommended: z.coerce.boolean().optional(),
   isHot: z.coerce.boolean().optional(),

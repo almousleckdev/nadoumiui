@@ -64,15 +64,25 @@ export function DetailsTab() {
         />
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-gray-700">Scholarship Benefits</label>
-        <textarea
-          rows={4}
-          placeholder="e.g. Free dorm, waived tuition..."
-          {...register("benefits")}
-          className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
-        />
-      </div>
+      <Controller
+        name="benefits"
+        control={control}
+        render={({ field }) => {
+          const val = Array.isArray(field.value)
+            ? field.value
+            : typeof field.value === "string" && field.value.trim()
+            ? field.value.split("\n").filter(Boolean)
+            : [];
+          return (
+            <TagsInput
+              label="Scholarship Benefits (Multiple Entries)"
+              value={val}
+              onChange={field.onChange}
+              placeholder="e.g. 100% Tuition Waiver, Free Quad Dormitory, Monthly Stipend"
+            />
+          );
+        }}
+      />
 
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium text-gray-700">Recommendation Notes</label>

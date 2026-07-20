@@ -2,34 +2,9 @@ import Image from "next/image";
 import Card from "@/components/ui/Card";
 import { Star } from "lucide-react";
 import SectionHeader from "@/components/ui/SectionHeader";
-export function TestimonialSection() {
-  const testimonials = [
-    {
-      name: "Abdoulaye Diallo",
-      country: "Guinea",
-      university: "Tsinghua University",
-      program: "M.S. in Computer Science",
-      image: "/images/student.jpg",
-      quote: "Thanks to Nadoumi, I received a fully funded CSC scholarship at Tsinghua. The team helped me translate all certificates, prepare the research proposal, and walked me through the visa process seamlessly.",
-    },
-    {
-      name: "Sophia Martinez",
-      country: "Mexico",
-      university: "Zhejiang University",
-      program: "MBA",
-      image: "/images/student1.jpg",
-      quote: "Applying to study abroad was overwhelming, but Nadoumi took care of everything. They selected three partner universities that fit my business interests, and within two months I had my admission letter.",
-    },
-    {
-      name: "Muhammad Ali",
-      country: "Pakistan",
-      university: "Sichuan University",
-      program: "Ph.D. in Biotechnology",
-      image: "/images/student2.jpg",
-      quote: "I highly recommend Nadoumi for doctoral applicants. They mapped my research background with academic supervisors in Chengdu, securing both my tuition waiver and full monthly stipend.",
-    },
-  ];
+import { TESTIMONIALS } from "@/data/homeData";
 
+export function TestimonialSection() {
   return (
     <section className="py-24 bg-gray-50 border-t border-gray-100">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -43,7 +18,7 @@ export function TestimonialSection() {
 
         {/* Testimonials Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((t, idx) => (
+          {TESTIMONIALS.map((t, idx) => (
             <Card key={idx} hover className="flex flex-col h-full bg-white p-8 border border-gray-100 relative">
               
               {/* Star Rating */}

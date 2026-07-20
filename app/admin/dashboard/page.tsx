@@ -2,7 +2,6 @@
 
 import React, { useMemo } from "react";
 import Link from "next/link";
-import { FileText, Clock, GraduationCap, School } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getDashboardStats } from "@/services/adminService";
 import { adminDashboardRecentApplicationColumns } from "@/features/applications/components/AdminDashboardRecentApplicationColumns";
@@ -12,6 +11,7 @@ import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
 import ErrorState from "@/components/ui/ErrorState";
 import EmptyState from "@/components/ui/EmptyState";
+import { buildAdminKpis } from "@/data/adminDashboardData";
 
 export default function AdminDashboardOverviewPage() {
   const { data: stats, isLoading, error, refetch, isRefetching } = useQuery({
@@ -37,32 +37,7 @@ export default function AdminDashboardOverviewPage() {
     );
   }
 
-  const kpis = [
-    {
-      label: "Total Applications",
-      value: stats?.summary.totalApplications ?? 0,
-      icon: <FileText className="w-6 h-6" />,
-      color: "text-blue-600 bg-blue-50 border-blue-100",
-    },
-    {
-      label: "Pending Reviews",
-      value: stats?.summary.pendingReviews ?? 0,
-      icon: <Clock className="w-6 h-6" />,
-      color: "text-orange-600 bg-orange-50 border-orange-100",
-    },
-    {
-      label: "Active Scholarships",
-      value: stats?.summary.totalScholarships ?? 0,
-      icon: <GraduationCap className="w-6 h-6" />,
-      color: "text-emerald-600 bg-emerald-50 border-emerald-100",
-    },
-    {
-      label: "Partner Universities",
-      value: stats?.summary.activeUniversities ?? 0,
-      icon: <School className="w-6 h-6" />,
-      color: "text-purple-600 bg-purple-50 border-purple-100",
-    },
-  ];
+  const kpis = buildAdminKpis(stats?.summary);
 
   return (
     <div className="space-y-8">

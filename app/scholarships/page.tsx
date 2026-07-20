@@ -12,7 +12,9 @@ import ErrorState from "@/components/ui/ErrorState";
 import EmptyState from "@/components/ui/EmptyState";
 import type { ProgramCategory, ScholarshipCategory } from "@/types";
 
-const PROGRAM_LEVEL_OPTIONS = [
+import { PROGRAM_LEVEL_OPTIONS, SCHOLARSHIP_CATEGORY_OPTIONS as GLOBAL_SCHOLARSHIP_OPTIONS } from "@/data/optionsData";
+
+const PROGRAM_LEVEL_FILTER_OPTIONS = [
   { value: "", label: "All Levels" },
   { value: "Language", label: "Language" },
   { value: "Bachelor", label: "Bachelor" },
@@ -20,7 +22,7 @@ const PROGRAM_LEVEL_OPTIONS = [
   { value: "PhD", label: "PhD" },
 ];
 
-const SCHOLARSHIP_CATEGORY_OPTIONS = [
+const SCHOLARSHIP_CATEGORY_FILTER_OPTIONS = [
   { value: "", label: "All Categories" },
   { value: "CSC", label: "CSC" },
   { value: "Province", label: "Province" },
@@ -73,7 +75,7 @@ function ScholarshipsContent() {
             {
               key: "programLevel",
               label: "Program Level",
-              options: PROGRAM_LEVEL_OPTIONS,
+              options: PROGRAM_LEVEL_FILTER_OPTIONS,
               value: programCategory,
               onChange: (val) => {
                 setProgramCategory(val as ProgramCategory | "");
@@ -83,7 +85,7 @@ function ScholarshipsContent() {
             {
               key: "scholarshipCategory",
               label: "Scholarship Category",
-              options: SCHOLARSHIP_CATEGORY_OPTIONS,
+              options: SCHOLARSHIP_CATEGORY_FILTER_OPTIONS,
               value: category,
               onChange: (val) => {
                 setCategory(val as ScholarshipCategory | "");

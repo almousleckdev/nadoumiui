@@ -7,6 +7,35 @@ export type Currency = "RMB" | "USD";
 export type ScholarshipAvailability = "Available" | "Limited" | "Not_Available";
 
 export type ProgramCategory = "Language" | "Bachelor" | "Master" | "PhD";
+export type ProgramType = "Language" | "Bachelor" | "Master" | "PhD";
+
+export interface ProgramMajorItem {
+  id?: string;
+  name: string;
+  code?: string;
+  field?: string;
+}
+
+export interface UniversityProgramItem {
+  id?: string;
+  type: ProgramType;
+  title?: string;
+  duration?: string;
+  majors: ProgramMajorItem[];
+}
+
+export interface DocumentItem {
+  name: string;
+  required: boolean;
+  notes?: string;
+}
+
+export interface ProgramStipendItem {
+  programType: ProgramType;
+  stipendAmount?: number | null;
+  stipendUnit?: string;
+  notes?: string;
+}
 
 export type ScholarshipCategory =
   | "Self_funded"
@@ -75,11 +104,16 @@ export interface University {
   officePhone?: string | null;
   isRecommended: boolean;
   isPartner: boolean;
+  partnerId?: string | null;
+  partner?: Partner | null;
   isTop: boolean;
   qsRank?: number | null;
   scholarshipAvailability: ScholarshipAvailability;
   albums?: string[] | null;
   status: UniversityStatus;
+  majors?: any[] | null;
+  programs?: UniversityProgramItem[] | null;
+  requiredDocuments?: DocumentItem[] | any[] | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -87,13 +121,21 @@ export interface University {
 export interface Partner {
   id: string;
   partnerId: string;
+  partnerType: "university" | "agency";
   nameEn: string;
   nameCn?: string | null;
   logo?: string | null;
-  topMajors: string[];
-  research?: string | null;
+  country?: string | null;
   province?: string | null;
   city?: string | null;
+  contactPerson?: string | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+  servicesOffered?: string[];
+  commissionRate?: string | null;
+  agreementNotes?: string | null;
+  topMajors: string[];
+  research?: string | null;
   rank?: number | null;
   totalStudents?: number | null;
   totalForeignStudents?: number | null;
@@ -166,6 +208,8 @@ export interface Scholarship {
   originalTuitionFee?: number | null;
   tuitionFeeAfterScholarship?: number | null;
   accommodationFeeAfterScholarship?: number | null;
+  accommodationFee?: string | null;
+  accommodationFeeQuad?: number | null;
   teachingLanguage?: TeachingLanguage | null;
   status: ScholarshipStatus;
   isRecommended: boolean;
@@ -177,14 +221,57 @@ export interface Scholarship {
   universities?: University[];
   
   // Added fields from backend schema
-  benefits?: unknown | null;
+  benefits?: string[] | string | null;
   requirements?: unknown | null;
-  stipend?: unknown | null;
+  hasStipend?: boolean;
+  stipend?: Record<string, any> | ProgramStipendItem[] | string | null;
   feeStructure?: unknown | null;
+  insurance?: string | null;
+  visaFee?: number | null;
   scoreRequirementsEnglish?: string | null;
   scoreRequirementsChinese?: string | null;
-  applicationDocuments?: unknown | null;
+  applicationDocuments?: DocumentItem[] | string | null;
+  additionalDocuments?: DocumentItem[] | string | null;
+  locations?: Array<{
+    id?: string;
+    city?: string | null;
+    province?: string | null;
+    country?: string | null;
+    requiredDocuments?: DocumentItem[] | any[] | null;
+  }> | null;
+  universityMajors?: Array<{ name: string; degree?: string; duration?: string }> | any[] | null;
+  ageMin?: number | null;
+  ageMax?: number | null;
+  acceptedCountries?: string[] | null;
+  chinaVisitPolicy?: string | null;
+  acceptMinors?: boolean | null;
+  currentLocationPolicy?: string | null;
+  gpaMin?: number | null;
+  ieltsScore?: number | null;
+  toeflScore?: number | null;
+  duolingoScore?: number | null;
+  hskLevel?: number | null;
+  universityFeeCurrency?: string | null;
+  registrationFee?: string | null;
+  nadoumiApplicationFee?: number | null;
+  nadoumiServiceFee?: number | null;
+  nadoumiFeeCurrency?: string | null;
+  specialNotes?: string | null;
+  scholarshipPolicy?: string | null;
+  recommendationNotes?: string | null;
+  applicantRequirements?: string | null;
+  intake?: string | null;
   startDate?: string | null;
+  scholarshipDuration?: number | null;
+  scholarshipDurationText?: string | null;
+  additionalFees?: string | null;
+  scoreRequirements?: string | null;
+  programSelection?: Array<{
+    programType: ProgramType;
+    majors?: string[];
+    stipendAmount?: number | null;
+    stipendUnit?: string | null;
+  }> | null;
 
   createdAt: string;
   updatedAt: string;

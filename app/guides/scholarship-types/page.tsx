@@ -47,7 +47,7 @@ export default function ScholarshipTypesPage() {
           ))}
         </div>
         
-        {/* ── NADOUMI EXCLUSIVE BANNER ─────────────────────────────────────────── */}
+        {/* NADOUMI EXCLUSIVE BANNER */}
         <div className="mt-16 bg-slate-50 border border-gray-200 rounded-2xl p-8 lg:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
            <div className="max-w-2xl">
              <span className="inline-block px-3 py-1 rounded-md bg-white text-gray-700 text-xs font-semibold uppercase tracking-wider mb-4 border border-gray-200 shadow-sm">

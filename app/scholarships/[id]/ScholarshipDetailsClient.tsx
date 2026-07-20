@@ -15,6 +15,8 @@ import { ClockIcon, AcademicCapIcon, DocumentCheckIcon, CheckCircleIcon, UserGro
 import { ScholarshipHero } from "./ScholarshipHero";
 import { ScholarshipApplySidebar } from "./ScholarshipApplySidebar";
 
+import { formatDeadline, getDaysRemaining, isDeadlineUrgent } from "@/utils/formatDate";
+
 interface ScholarshipDetailsClientProps {
   initialData: Scholarship;
 }
@@ -98,10 +100,9 @@ export default function ScholarshipDetailsPage({ initialData }: ScholarshipDetai
     );
   }
 
-  const deadlineDate = new Date(scholarship.applicationDeadline);
-  const deadlineStr = deadlineDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
-  const daysLeft = Math.ceil((deadlineDate.getTime() - new Date().getTime()) / (1000 * 3600 * 24));
-  const isUrgent = daysLeft > 0 && daysLeft <= 14;
+  const deadlineStr = formatDeadline(scholarship.applicationDeadline);
+  const daysLeft = getDaysRemaining(scholarship.applicationDeadline);
+  const isUrgent = isDeadlineUrgent(daysLeft);
   const university = scholarship.universities?.[0];
 
   return (
