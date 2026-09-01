@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface SectionHeaderProps {
-  badge?: string;
+  badge?: React.ReactNode;
   title: string;
   description?: string;
   align?: 'left' | 'center' | 'right';
@@ -28,7 +28,7 @@ export default function SectionHeader({
   return (
     <div className={`flex flex-col max-w-3xl mb-16 ${alignmentClasses[align]} ${className}`}>
       {badge && (
-        <span className={`text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-6 inline-block border
+        <span className={`text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-6 inline-flex items-center gap-2 border
           ${isDark ? 'text-orange-400 bg-orange-600/20 border-orange-500/30' : 'text-orange-600 bg-orange-50 border-orange-100'}
         `}>
           {badge}

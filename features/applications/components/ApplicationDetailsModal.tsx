@@ -5,6 +5,7 @@ import Button from "@/components/ui/Button";
 import type { Application } from "@/types";
 import { AdmissionDocumentsSection } from "./application-details/AdmissionDocumentsSection";
 import { InterviewDetailsSection } from "./application-details/InterviewDetailsSection";
+import { RejectionDetailsSection } from "./application-details/RejectionDetailsSection";
 import { ApplicationStatusTimeline } from "./application-details/ApplicationStatusTimeline";
 
 interface ApplicationDetailsModalProps {
@@ -37,6 +38,10 @@ export function ApplicationDetailsModal({ application, onClose }: ApplicationDet
 
         {application.status === "interview" && application.interviewDetails && (
           <InterviewDetailsSection interviewDetails={application.interviewDetails} />
+        )}
+
+        {application.status === "rejected" && application.rejectionDetails && (
+          <RejectionDetailsSection rejectionDetails={application.rejectionDetails} />
         )}
 
         <div className="space-y-4">

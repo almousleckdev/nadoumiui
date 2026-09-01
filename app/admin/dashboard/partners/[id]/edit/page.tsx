@@ -9,6 +9,7 @@ import { PartnerForm } from "@/features/partners/components/PartnerForm";
 import Loading from "@/components/ui/Loading";
 import ErrorState from "@/components/ui/ErrorState";
 import { toast } from "react-hot-toast";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 export default function EditPartnerPage() {
   const router = useRouter();
@@ -35,8 +36,8 @@ export default function EditPartnerPage() {
       toast.success("Partner updated successfully!");
       router.push("/admin/dashboard/partners");
     },
-    onError: () => {
-      toast.error("Failed to update partner.");
+    onError: (err: unknown) => {
+      toast.error(getErrorMessage(err));
     },
   });
 

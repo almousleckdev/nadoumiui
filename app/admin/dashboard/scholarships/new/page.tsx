@@ -5,6 +5,7 @@ import { createScholarship } from "@/services/scholarshipService";
 import { type ScholarshipFormValues } from "@/lib/validations/scholarship";
 import { ScholarshipForm } from "@/features/scholarships/components/ScholarshipForm";
 import { toast } from "react-hot-toast";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 export default function NewScholarshipPage() {
   const router = useRouter();
@@ -17,8 +18,8 @@ export default function NewScholarshipPage() {
       toast.success("Scholarship published successfully!");
       router.push("/admin/dashboard/scholarships");
     },
-    onError: () => {
-      toast.error("Failed to publish scholarship.");
+    onError: (err: unknown) => {
+      toast.error(getErrorMessage(err));
     }
   });
 

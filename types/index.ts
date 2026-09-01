@@ -340,6 +340,11 @@ export interface Application {
     notes?: string | null;
     scheduledAt?: string | null;
   } | null;
+  rejectionDetails?: {
+    reason?: string | null;
+    feedback?: string | null;
+    rejectedAt?: string | null;
+  } | null;
   admissionDocument?: {
     path: string;
     uploadedAt: string;

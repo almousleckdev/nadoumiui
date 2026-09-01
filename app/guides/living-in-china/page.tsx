@@ -1,5 +1,6 @@
 import React from 'react';
 import PageShell from '@/components/layout/PageShell';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
 import { livingExpenses as expenses } from '@/data/guides';
 import { TRANSPORT_OPTIONS, FESTIVALS } from '@/data/livingInChinaData';
 
@@ -19,30 +20,22 @@ export default function LivingInChinaPage() {
           </p>
 
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm text-left">
-            <table className="min-w-full divide-y divide-gray-200 text-left">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Expense Type
-                  </th>
-                  <th scope="col" className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
-                    Estimated Cost
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Expense Type</TableHead>
+                  <TableHead className="text-right">Estimated Cost</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {expenses.map((exp, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                      {exp.item}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
-                      {exp.cost}
-                    </td>
-                  </tr>
+                  <TableRow key={idx}>
+                    <TableCell className="text-sm text-gray-900 font-medium">{exp.item}</TableCell>
+                    <TableCell className="text-sm text-gray-600 text-right">{exp.cost}</TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </div>
 

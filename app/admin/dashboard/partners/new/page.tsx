@@ -6,6 +6,7 @@ import { createPartner } from "@/services/partnerService";
 import { type PartnerFormValues } from "@/lib/validations/partner";
 import { PartnerForm } from "@/features/partners/components/PartnerForm";
 import { toast } from "react-hot-toast";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 export default function NewPartnerPage() {
   const router = useRouter();
@@ -18,13 +19,13 @@ export default function NewPartnerPage() {
       toast.success("Partner added successfully!");
       router.push("/admin/dashboard/partners");
     },
-    onError: () => {
-      toast.error("Failed to add partner");
+    onError: (err: unknown) => {
+      toast.error(getErrorMessage(err));
     },
   });
 
   const onSubmit = (data: PartnerFormValues) => {
-    createMutation.mutate(data);
+    createMutation.mutate(data as any);
   };
 
   return (

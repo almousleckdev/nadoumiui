@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import { FormProvider, useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
-import { uploadMediaAsset } from "@/services/mediaService";
 import { partnerSchema, type PartnerFormValues } from "@/lib/validations/partner";
+import { useImageUpload } from "@/hooks/useImageUpload";
 import { resolveDocumentUrl } from "@/utils/resolveUrl";
 
 import Button from "@/components/ui/Button";
@@ -45,8 +45,6 @@ export function PartnerForm({
   submitText,
   onCancel,
 }: PartnerFormProps) {
-  const [isLogoUploading, setIsLogoUploading] = useState(false);
-
   const form = useForm<PartnerFormValues>({
     resolver: zodResolver(partnerSchema) as any,
     defaultValues: {
@@ -82,23 +80,22 @@ export function PartnerForm({
   const partnerType = watch("partnerType") || "university";
   const logo = watch("logo");
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const { isUploading: isLogoUploading, handleUpload: handleLogoUpload } = useImageUpload(
+    setValue,
+    "logo",
+    "partners/logos",
+    "logo"
+  );
 
-    try {
-      setIsLogoUploading(true);
-      const res = await uploadMediaAsset(file, "partners/logos");
-      setValue("logo", res.url, { shouldValidate: true });
-    } catch (err) {
-      console.error("Logo upload failed:", err);
-      toast.error("Failed to upload logo. Please try again.");
-    } finally {
-      setIsLogoUploading(false);
-    }
+  const onInvalid = (fieldErrors: any) => {
+    console.error("Partner form validation errors:", fieldErrors);
+    toast.error("Please fix the validation errors before submitting.");
   };
 
-  const handleFormSubmit = handleSubmit((data) => onSubmit(data as unknown as PartnerFormValues));
+  const handleFormSubmit = handleSubmit(
+    (data) => onSubmit(data as unknown as PartnerFormValues),
+    onInvalid
+  );
 
   return (
     <FormProvider {...form}>
@@ -119,19 +116,21 @@ export function PartnerForm({
           </div>
         </div>
 
+        {/* Backend / Network Error Banner */}
         {isError && (
-          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700 font-medium">
-            {errorMessage || "An error occurred."}
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-800 font-medium shadow-xs">
+            <span className="font-bold text-rose-900">Submission Error:</span> {errorMessage || "An error occurred."}
           </div>
         )}
 
+        {/* Form Validation Errors Banner */}
         {Object.keys(errors).length > 0 && (
-          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-900 font-medium space-y-1">
-            <p className="font-bold text-red-700">Please fix the validation errors below:</p>
-            <ul className="list-disc pl-5 text-xs text-red-800">
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 shadow-sm space-y-2">
+            <p className="font-bold text-sm text-rose-800">Please resolve the following validation errors before submitting:</p>
+            <ul className="list-disc pl-5 text-xs space-y-1 text-rose-800 font-medium">
               {Object.entries(errors).map(([key, err]) => (
                 <li key={key}>
-                  <strong className="capitalize">{key}:</strong> {(err as any)?.message}
+                  <strong className="capitalize text-rose-900 font-bold">{key.replace(/([A-Z])/g, " $1")}:</strong> {(err as any)?.message || "Required / Invalid format"}
                 </li>
               ))}
             </ul>

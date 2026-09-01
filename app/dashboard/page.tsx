@@ -9,6 +9,7 @@ import { dashboardRecentApplicationColumns } from "@/features/applications/compo
 import { DataTable } from "@/components/ui/DataTable";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import { MetricCard } from "@/components/ui/MetricCard";
 import Loading from "@/components/ui/Loading";
 import ErrorState from "@/components/ui/ErrorState";
 import { PlusCircle } from "lucide-react";
@@ -87,25 +88,10 @@ export default function StudentDashboardPage() {
 
       {/* Stats Counters Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
-        <Card className="p-6">
-          <span className="text-sm font-semibold text-gray-500 block">Total Applications</span>
-          <span className="text-3xl font-black text-gray-900 mt-2 block font-heading">{total}</span>
-        </Card>
-
-        <Card className="p-6">
-          <span className="text-sm font-semibold text-gray-500 block">In Progress</span>
-          <span className="text-3xl font-black text-gray-900 mt-2 block font-heading">{pending}</span>
-        </Card>
-
-        <Card className="p-6">
-          <span className="text-sm font-semibold text-gray-500 block">Accepted</span>
-          <span className="text-3xl font-black text-gray-900 mt-2 block font-heading">{accepted}</span>
-        </Card>
-
-        <Card className="p-6">
-          <span className="text-sm font-semibold text-gray-500 block">Rejected</span>
-          <span className="text-3xl font-black text-gray-900 mt-2 block font-heading">{rejected}</span>
-        </Card>
+        <MetricCard label="Total Applications" value={total} />
+        <MetricCard label="In Progress" value={pending} />
+        <MetricCard label="Accepted" value={accepted} />
+        <MetricCard label="Rejected" value={rejected} />
       </div>
 
       {/* Recent Applications Section */}

@@ -113,9 +113,9 @@ export function PartnershipForm() {
           Thank you for your interest in partnering with Nadoumi. Our business development team will review your
           inquiry and get back to you within 24 hours on business days.
         </p>
-        <button onClick={() => reset()} className="mt-8 text-orange-600 font-semibold hover:text-orange-700">
+        <Button type="button" variant="link" onClick={() => reset()} className="mt-8 p-0">
           Submit another inquiry
-        </button>
+        </Button>
       </div>
     );
   }

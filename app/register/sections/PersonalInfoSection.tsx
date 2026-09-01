@@ -1,9 +1,10 @@
 import { Controller, useFormContext } from "react-hook-form";
-import Select from "react-select";
+import ReactSelect from "react-select";
 import PhoneInput from "react-phone-number-input";
 import type { RegisterFormValues } from "../schema";
 import { GENDER_OPTIONS } from "../schema";
 import Input from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 
 interface PersonalInfoSectionProps {
   countries: Array<{ value: string; label: string }>;
@@ -69,7 +70,7 @@ export function PersonalInfoSection({ countries }: PersonalInfoSectionProps) {
             name="country"
             control={control}
             render={({ field }) => (
-              <Select
+              <ReactSelect
                 {...field}
                 instanceId="register-country-select"
                 options={countries}
@@ -107,24 +108,20 @@ export function PersonalInfoSection({ countries }: PersonalInfoSectionProps) {
           error={errors.dateOfBirth?.message}
         />
 
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Gender *</label>
-          <Controller
-            name="gender"
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                instanceId="register-gender-select"
-                options={GENDER_OPTIONS}
-                value={GENDER_OPTIONS.find((o) => o.value === field.value)}
-                onChange={(val) => field.onChange(val?.value)}
-                placeholder="Select Gender"
-              />
-            )}
-          />
-          {errors.gender && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.gender.message}</p>}
-        </div>
+        <Controller
+          name="gender"
+          control={control}
+          render={({ field }) => (
+            <Select
+              label="Gender *"
+              options={GENDER_OPTIONS}
+              value={field.value ?? ""}
+              onChange={(e) => field.onChange(e.target.value)}
+              placeholder="Select Gender"
+              error={errors.gender?.message}
+            />
+          )}
+        />
       </div>
     </section>
   );

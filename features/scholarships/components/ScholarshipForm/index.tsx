@@ -5,13 +5,19 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { getUniversities } from "@/services/universityService";
-import { uploadMediaAsset } from "@/services/mediaService";
 import { scholarshipSchema, type ScholarshipFormValues } from "@/lib/validations/scholarship";
 import { toast } from "react-hot-toast";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import { useTabErrorCount } from "@/hooks/useTabErrorCount";
 
 import Button from "@/components/ui/Button";
-import { cn } from "@/utils/cn";
-import { SCHOLARSHIP_FORM_TABS, type ScholarshipFormTabId } from "./constants";
+import { SidebarTabs } from "@/components/ui/SidebarTabs";
+import {
+  SCHOLARSHIP_FORM_TABS,
+  SCHOLARSHIP_TAB_FIELD_MAP,
+  getScholarshipTabForField,
+  type ScholarshipFormTabId,
+} from "./constants";
 import { BasicInfoTab } from "./tabs/BasicInfoTab";
 import { AcademicTab } from "./tabs/AcademicTab";
 import { EligibilityTab } from "./tabs/EligibilityTab";
@@ -43,7 +49,6 @@ export function ScholarshipForm({
   onCancel,
 }: ScholarshipFormProps) {
   const [activeTab, setActiveTab] = useState<ScholarshipFormTabId>("basic");
-  const [isCoverUploading, setIsCoverUploading] = useState(false);
 
   // Fetch partner universities for dropdown
   const {
@@ -111,19 +116,21 @@ export function ScholarshipForm({
     }
   }, [initialData, reset]);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const { isUploading: isCoverUploading, handleUpload: handleImageUpload } = useImageUpload(
+    setValue,
+    "coverImage",
+    "scholarships",
+    "cover image"
+  );
 
-    try {
-      setIsCoverUploading(true);
-      const res = await uploadMediaAsset(file, "scholarships");
-      setValue("coverImage", res.url, { shouldValidate: true });
-    } catch (err) {
-      console.error("Cover upload failed:", err);
-      toast.error("Failed to upload cover image. Please try again.");
-    } finally {
-      setIsCoverUploading(false);
+  const onInvalid = (fieldErrors: any) => {
+    console.error("Scholarship form validation errors:", fieldErrors);
+    toast.error("Please fix the validation errors in the highlighted tabs.");
+
+    const firstErrorKey = Object.keys(fieldErrors)[0];
+    if (firstErrorKey) {
+      const targetTab = getScholarshipTabForField(firstErrorKey);
+      setActiveTab(targetTab.id);
     }
   };
 
@@ -170,10 +177,7 @@ export function ScholarshipForm({
       }
       onSubmit(submitData as any);
     },
-    (errors) => {
-      console.error("Form validation errors:", errors);
-      toast.error("Please fix validation errors listed in the red error banner.");
-    }
+    onInvalid
   );
 
   const universityOptions =
@@ -182,20 +186,7 @@ export function ScholarshipForm({
       label: u.name,
     })) || [];
 
-  // Map fields to form tabs to show validation indicator on tab buttons
-  const getTabHasError = (tabId: ScholarshipFormTabId) => {
-    if (Object.keys(errors).length === 0) return false;
-    const tabFieldMap: Record<ScholarshipFormTabId, string[]> = {
-      basic: ["title", "scholarshipCategory", "programCategories", "applicationDeadline", "universities", "programSelection"],
-      academic: ["gpaMin", "ieltsScore", "toeflScore", "hskLevel"],
-      eligibility: ["ageMin", "ageMax", "acceptedCountries"],
-      financials: ["originalTuitionFee", "tuitionFeeAfterScholarship", "visaFee"],
-      details: ["description", "benefits"],
-      publish: ["coverImage", "status"],
-    };
-    const fields = tabFieldMap[tabId] || [];
-    return fields.some((f) => Boolean(errors[f as keyof typeof errors]));
-  };
+  const getTabErrorCount = useTabErrorCount<ScholarshipFormTabId>(errors, SCHOLARSHIP_TAB_FIELD_MAP);
 
   return (
     <FormProvider {...form}>
@@ -215,50 +206,56 @@ export function ScholarshipForm({
           </div>
         </div>
 
+        {/* Backend / Network Error Banner */}
         {isError && (
-          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700 font-medium flex items-center gap-2">
-            <span className="font-bold">Error:</span> {errorMessage || "An error occurred during submission."}
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-800 font-medium flex items-center gap-2 shadow-xs">
+            <span className="font-bold text-rose-900">Submission Error:</span> {errorMessage || "An error occurred during submission."}
           </div>
         )}
 
+        {/* Form Validation Errors Banner */}
         {Object.keys(errors).length > 0 && (
-          <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-sm text-red-900 font-medium space-y-2 shadow-xs">
-            <div className="font-bold flex items-center gap-2 text-red-700 text-sm">
-              <span>Form Validation Errors - Please fix the fields below:</span>
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 shadow-sm space-y-3">
+            <div className="font-bold flex items-center gap-2 text-rose-800 text-sm">
+              <span>Please resolve the following validation errors before submitting:</span>
             </div>
-            <ul className="list-disc pl-5 text-xs space-y-1 text-red-800">
-              {Object.entries(errors).map(([key, err]) => (
-                <li key={key}>
-                  <strong className="capitalize font-bold text-red-900">{key}:</strong> {(err as any)?.message || "Required / Invalid format"}
-                </li>
-              ))}
-            </ul>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              {Object.entries(errors).map(([key, err]) => {
+                const tab = getScholarshipTabForField(key);
+                const message = (err as any)?.message || "Required / Invalid format";
+                return (
+                  <button
+                    type="button"
+                    key={key}
+                    onClick={() => setActiveTab(tab.id)}
+                    className="flex items-start justify-between p-2.5 bg-white rounded-lg border border-rose-200 hover:border-rose-400 cursor-pointer transition-colors group shadow-2xs text-left w-full"
+                  >
+                    <div>
+                      <span className="font-semibold text-gray-500 uppercase tracking-wider text-[10px] block">
+                        Tab: {tab.label}
+                      </span>
+                      <span className="font-bold text-rose-700 capitalize">
+                        {key.replace(/([A-Z])/g, " $1")}:
+                      </span>{" "}
+                      <span className="text-gray-700">{message}</span>
+                    </div>
+                    <span className="text-[11px] font-bold text-orange-600 group-hover:underline shrink-0 ml-2 mt-0.5">
+                      Fix &rarr;
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
 
         <div className="flex flex-col md:flex-row gap-8">
-          <div className="w-full md:w-64 shrink-0 space-y-1">
-            {SCHOLARSHIP_FORM_TABS.map((tab) => {
-              const hasErr = getTabHasError(tab.id);
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={cn(
-                    "w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition-colors duration-200 flex items-center justify-between",
-                    activeTab === tab.id
-                      ? "bg-slate-900 text-white"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
-                  )}
-                >
-                  <span>{tab.label}</span>
-                  {hasErr && (
-                    <span className="w-2 h-2 rounded-full bg-rose-500 ring-2 ring-rose-300 animate-pulse" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
+          <SidebarTabs
+            tabs={SCHOLARSHIP_FORM_TABS}
+            activeTab={activeTab}
+            onChange={setActiveTab}
+            getErrorCount={getTabErrorCount}
+          />
 
           <div className="flex-1">
             <form id="scholarshipForm" onSubmit={handleFormSubmit} className="space-y-6">

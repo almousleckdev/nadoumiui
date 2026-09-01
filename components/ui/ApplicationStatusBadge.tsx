@@ -2,9 +2,10 @@ import Badge from "@/components/ui/Badge";
 
 interface ApplicationStatusBadgeProps {
   status: string;
+  size?: "sm" | "md";
 }
 
-export function ApplicationStatusBadge({ status }: ApplicationStatusBadgeProps) {
+export function ApplicationStatusBadge({ status, size = "md" }: ApplicationStatusBadgeProps) {
   const variant =
     status === "accepted" || status === "interview_passed"
       ? "success"
@@ -18,5 +19,9 @@ export function ApplicationStatusBadge({ status }: ApplicationStatusBadgeProps) 
       ? "info"
       : "warning";
 
-  return <Badge variant={variant}>{status.replace(/_/g, " ")}</Badge>;
+  return (
+    <Badge variant={variant} size={size}>
+      {status.replace(/_/g, " ")}
+    </Badge>
+  );
 }

@@ -71,6 +71,10 @@ export function AdminUpdateStatusModal({ application, onClose }: AdminUpdateStat
       metadata.revocationDetails = revocationDetails || null;
     }
 
+    if (adminNote.trim()) {
+      metadata.adminNote = adminNote.trim();
+    }
+
     updateStatus(
       { id: application.id, status, metadata },
       {

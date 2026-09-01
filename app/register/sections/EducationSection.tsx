@@ -1,8 +1,8 @@
 import { Controller, useFormContext } from "react-hook-form";
-import Select from "react-select";
 import type { RegisterFormValues } from "../schema";
 import { CURRENT_LEVEL_OPTIONS } from "../schema";
 import Input from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 
 export function EducationSection() {
   const {
@@ -18,25 +18,20 @@ export function EducationSection() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Current Level *</label>
-          <Controller
-            name="currentLevel"
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                options={CURRENT_LEVEL_OPTIONS}
-                value={CURRENT_LEVEL_OPTIONS.find((o) => o.value === field.value)}
-                onChange={(val) => field.onChange(val?.value)}
-                placeholder="Select Level"
-              />
-            )}
-          />
-          {errors.currentLevel && (
-            <p className="mt-1.5 text-xs font-medium text-red-500">{errors.currentLevel.message}</p>
+        <Controller
+          name="currentLevel"
+          control={control}
+          render={({ field }) => (
+            <Select
+              label="Current Level *"
+              options={CURRENT_LEVEL_OPTIONS}
+              value={field.value ?? ""}
+              onChange={(e) => field.onChange(e.target.value)}
+              placeholder="Select Level"
+              error={errors.currentLevel?.message}
+            />
           )}
-        </div>
+        />
 
         <Input
           label="University / School Name *"

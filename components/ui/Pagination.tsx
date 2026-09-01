@@ -93,17 +93,15 @@ export default function Pagination({
                 (page >= currentPage - 1 && page <= currentPage + 1)
               ) {
                 return (
-                  <button
+                  <Button
                     key={page}
+                    size="icon"
+                    variant={currentPage === page ? "primary" : "ghost"}
+                    className="text-sm font-medium"
                     onClick={() => onPageChange(page)}
-                    className={`w-8 h-8 flex items-center justify-center rounded text-sm font-medium transition-colors ${
-                      currentPage === page
-                        ? "bg-orange-600 text-white"
-                        : "text-gray-600 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-800"
-                    }`}
                   >
                     {page}
-                  </button>
+                  </Button>
                 );
               } else if (page === currentPage - 2 || page === currentPage + 2) {
                 return (

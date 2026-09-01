@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { getConversations, getMessages, sendMessage, uploadMessageFile } from "@/services/messageService";
 import Card from "@/components/ui/Card";
 import ErrorState from "@/components/ui/ErrorState";
+import { Loading } from "@/components/ui/Loading";
 import type { Conversation, Message } from "@/types";
 import { File, MessageSquare } from "lucide-react";
 import { useConversationSocket } from "@/features/messages/hooks/useConversationSocket";
@@ -132,9 +133,7 @@ function ChatWorkspace() {
 
         <div className="flex-1 overflow-y-auto divide-y divide-gray-200">
           {isConvLoading ? (
-            <div className="text-center py-12 text-gray-400 text-xs animate-pulse">
-              Loading support conversations...
-            </div>
+            <Loading text="Loading support conversations..." className="py-12" />
           ) : convError ? (
             <ErrorState
               title="Couldn't load conversations"
@@ -210,7 +209,7 @@ function ChatWorkspace() {
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/40">
               {isMessagesLoading ? (
-                <div className="text-center py-12 text-gray-400 text-xs">Loading chat messages...</div>
+                <Loading text="Loading chat messages..." className="py-12" />
               ) : messagesError ? (
                 <ErrorState
                   title="Couldn't load this conversation"
@@ -270,7 +269,7 @@ export default function AdminMessagesPage() {
         </p>
       </div>
 
-      <Suspense fallback={<div className="text-center py-12 text-gray-400">Loading chat workspace...</div>}>
+      <Suspense fallback={<Loading text="Loading chat workspace..." className="py-12" />}>
         <ChatWorkspace />
       </Suspense>
     </div>

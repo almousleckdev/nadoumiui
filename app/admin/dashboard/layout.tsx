@@ -4,11 +4,9 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { logoutAdmin, getAdminProfile } from "@/services/authService";
-import Modal from "@/components/ui/Modal";
-import Button from "@/components/ui/Button";
-import Sidebar, { SidebarLink } from "@/components/layout/Sidebar";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import Sidebar from "@/components/layout/Sidebar";
 import Loading from "@/components/ui/Loading";
-import { UserCircle } from "lucide-react";
 
 export default function AdminDashboardLayout({
   children,
@@ -68,27 +66,14 @@ export default function AdminDashboardLayout({
       </main>
 
       {/* Logout Confirmation Modal */}
-      <Modal
+      <ConfirmationModal
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogout}
         title="Confirm Log Out"
-        size="sm"
-      >
-        <div className="space-y-4">
-          <p className="text-sm text-gray-500 leading-relaxed">
-            Are you sure you want to log out of the Nadoumi Admin Portal? You
-            will need to log back in to access dashboard analytics.
-          </p>
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-            <Button variant="ghost" onClick={() => setIsLogoutModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="danger" onClick={handleLogout}>
-              Log Out
-            </Button>
-          </div>
-        </div>
-      </Modal>
+        message="Are you sure you want to log out of the Nadoumi Admin Portal? You will need to log back in to access dashboard analytics."
+        confirmText="Log Out"
+      />
     </div>
   );
 }

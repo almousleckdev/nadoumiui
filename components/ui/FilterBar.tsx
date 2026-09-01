@@ -17,8 +17,9 @@ export interface FilterBarSelectConfig {
 }
 
 export interface FilterBarProps {
-  searchValue: string;
-  onSearchChange: (value: string) => void;
+  /** Omit both searchValue and onSearchChange for a filters-only bar (e.g. status-only filtering). */
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
   searchPlaceholder?: string;
   filters: FilterBarSelectConfig[];
   onClear: () => void;
@@ -33,13 +34,15 @@ export function FilterBar({
   onClear,
   className,
 }: FilterBarProps) {
-  const [localSearch, setLocalSearch] = useState(searchValue);
-  const [lastSeenSearchValue, setLastSeenSearchValue] = useState(searchValue);
+  const hasSearch = searchValue !== undefined && onSearchChange !== undefined;
+
+  const [localSearch, setLocalSearch] = useState(searchValue ?? "");
+  const [lastSeenSearchValue, setLastSeenSearchValue] = useState(searchValue ?? "");
   const debouncedSearch = useDebouncedValue(localSearch, 400);
 
   // Push the debounced value up once it settles.
   useEffect(() => {
-    if (debouncedSearch !== searchValue) {
+    if (hasSearch && debouncedSearch !== searchValue) {
       onSearchChange(debouncedSearch);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -47,7 +50,7 @@ export function FilterBar({
 
   // Reflect external changes (e.g. a Clear button, or a URL-seeded initial value) back into the
   // input by adjusting state during render rather than in an effect (avoids an extra render pass).
-  if (searchValue !== lastSeenSearchValue) {
+  if (hasSearch && searchValue !== lastSeenSearchValue) {
     setLastSeenSearchValue(searchValue);
     setLocalSearch(searchValue);
   }
@@ -61,15 +64,17 @@ export function FilterBar({
         className
       )}
     >
-      <div className="flex-1 min-w-0">
-        <Input
-          icon={<Search className="w-4 h-4" aria-hidden="true" />}
-          placeholder={searchPlaceholder}
-          value={localSearch}
-          onChange={(e) => setLocalSearch(e.target.value)}
-          aria-label={searchPlaceholder}
-        />
-      </div>
+      {hasSearch && (
+        <div className="flex-1 min-w-0">
+          <Input
+            icon={<Search className="w-4 h-4" aria-hidden="true" />}
+            placeholder={searchPlaceholder}
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
+            aria-label={searchPlaceholder}
+          />
+        </div>
+      )}
 
       {filters.map((filter) => (
         <div key={filter.key} className="w-full sm:w-48 shrink-0">

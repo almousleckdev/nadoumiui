@@ -12,8 +12,8 @@ export default function StudentForgotPasswordPage() {
     await forgotPassword(email);
   };
 
-  const handleVerifyOtpAndReset = async (otp: string, password: string) => {
-    await resetPassword(otp, password);
+  const handleVerifyOtpAndReset = async (otp: string, password: string, email: string) => {
+    await resetPassword(otp, password, email);
   };
 
   const handleSuccessRedirect = () => {

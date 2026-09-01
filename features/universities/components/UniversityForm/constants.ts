@@ -10,6 +10,58 @@ export const UNIVERSITY_FORM_TABS = [
 
 export type UniversityFormTabId = (typeof UNIVERSITY_FORM_TABS)[number]["id"];
 
+export const UNIVERSITY_TAB_FIELD_MAP: Record<UniversityFormTabId, string[]> = {
+  basic: [
+    "universityId",
+    "name",
+    "nameInChinese",
+    "type",
+    "city",
+    "province",
+    "foundedYear",
+    "totalStudents",
+    "internationalStudents",
+    "qsRank",
+    "facultyCount",
+    "numberOfPrograms",
+    "introduction",
+    "isPartner",
+    "partnerId",
+  ],
+  academics: ["rankings", "majors"],
+  content: [
+    "description",
+    "history",
+    "highlights",
+    "advantages",
+    "opportunities",
+    "searchTags",
+    "searchKeywords",
+    "nearbyInfo",
+  ],
+  accommodation: ["accommodation", "campusFacilities"],
+  documents: ["requiredDocuments"],
+  media: ["logo", "bannerImage", "albums", "officialWebsite", "admissionsEmail", "officePhone"],
+  publish: [
+    "status",
+    "scholarshipAvailability",
+    "scholarshipNotes",
+    "isRecommended",
+    "isTop",
+    "recommendationNotes",
+  ],
+};
+
+export function getTabForField(fieldName: string): { id: UniversityFormTabId; label: string } {
+  for (const tab of UNIVERSITY_FORM_TABS) {
+    const fields = UNIVERSITY_TAB_FIELD_MAP[tab.id] || [];
+    if (fields.some((f) => fieldName === f || fieldName.startsWith(`${f}.`))) {
+      return tab;
+    }
+  }
+  return UNIVERSITY_FORM_TABS[0];
+}
+
 export const INSTITUTION_TYPE_OPTIONS = [
   { value: "Public", label: "Public" },
   { value: "Private", label: "Private" },

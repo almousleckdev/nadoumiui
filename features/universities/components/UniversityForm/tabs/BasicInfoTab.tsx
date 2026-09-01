@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
 import type { UniversityFormValues } from "@/lib/validations/university";
 import { getPartners } from "@/services/partnerService";
+import { reserveUniversityId } from "@/services/universityService";
 import type { Partner } from "@/types";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
@@ -33,7 +34,7 @@ export function BasicInfoTab() {
   const partners: Partner[] = partnersData?.partners || [];
 
   // Handle Partner Selection and Auto-Populate Fields
-  const handlePartnerSelect = (pId: string) => {
+  const handlePartnerSelect = async (pId: string) => {
     setSelectedPartnerId(pId);
     setValue("partnerId", pId, { shouldValidate: true });
 
@@ -66,6 +67,41 @@ export function BasicInfoTab() {
     setValue("isPartner", true, { shouldValidate: true });
 
     toast.success(`Populated university details from "${partner.nameEn}"!`);
+
+    // Reserve a unique university ID from the server if currently empty.
+    // Runs last since it's the only step that awaits — nothing above depends on it.
+    if (!watch("universityId")) {
+      try {
+        const reservedId = await reserveUniversityId(partner.nameEn);
+        // Only apply if this partner is still the active selection and the
+        // admin hasn't typed an ID themselves while this request was in flight.
+        if (watch("partnerId") === pId && !watch("universityId")) {
+          setValue("universityId", reservedId, { shouldValidate: true });
+        }
+      } catch (err) {
+        console.error("Failed to reserve university ID:", err);
+      }
+    }
+  };
+
+  const [isGeneratingId, setIsGeneratingId] = useState(false);
+
+  const handleGenerateId = async () => {
+    const name = watch("name") || "";
+    const currentUniId = watch("universityId") || "";
+    try {
+      setIsGeneratingId(true);
+      const reservedId = await reserveUniversityId(name);
+      // Only apply if the name and ID fields haven't changed since the request started.
+      if (watch("name") === name && (watch("universityId") || "") === currentUniId) {
+        setValue("universityId", reservedId, { shouldValidate: true });
+        toast.success("Generated Unique University ID");
+      }
+    } catch (err) {
+      console.error("Failed to generate university ID:", err);
+    } finally {
+      setIsGeneratingId(false);
+    }
   };
 
   return (
@@ -137,13 +173,27 @@ export function BasicInfoTab() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <Input
-          label="University ID * (Unique)"
-          placeholder="e.g. U-Tsinghua"
-          {...register("universityId")}
-          error={errors.universityId?.message}
-          className="bg-gray-50 border-gray-200 text-gray-900"
-        />
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+              University ID (Unique)
+            </label>
+            <button
+              type="button"
+              onClick={handleGenerateId}
+              disabled={isGeneratingId}
+              className="text-xs font-bold text-orange-600 hover:text-orange-700 underline focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isGeneratingId ? "Generating..." : "Auto-generate"}
+            </button>
+          </div>
+          <Input
+            placeholder="e.g. UNI-TSINGHUA-2026 (or leave blank to auto-generate)"
+            {...register("universityId")}
+            error={errors.universityId?.message}
+            className="bg-gray-50 border-gray-200 text-gray-900"
+          />
+        </div>
         <Input
           label="English Name *"
           placeholder="e.g. Tsinghua University"

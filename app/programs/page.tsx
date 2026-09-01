@@ -9,6 +9,7 @@ import FilterBar from "@/components/ui/FilterBar";
 import Pagination from "@/components/ui/Pagination";
 import ErrorState from "@/components/ui/ErrorState";
 import EmptyState from "@/components/ui/EmptyState";
+import { Loading } from "@/components/ui/Loading";
 import type { ProgramCategory } from "@/types";
 
 import { PROGRAM_LEVEL_OPTIONS } from "@/data/optionsData";
@@ -74,7 +75,7 @@ export default function ProgramsPage() {
         {isLoading && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="animate-pulse bg-white rounded-2xl border border-gray-100 p-6 h-[380px]" />
+              <Loading key={i} variant="skeleton" className="rounded-2xl border border-gray-100 h-[380px]" />
             ))}
           </div>
         )}

@@ -1,9 +1,11 @@
 import { type ReactNode } from "react";
-import { WifiOff, RefreshCw } from "lucide-react";
+import { WifiOff, AlertTriangle, RefreshCw } from "lucide-react";
 import { cn } from "@/utils/cn";
+import { isNetworkError, getErrorMessage } from "@/utils/getErrorMessage";
 import Button from "./Button";
 
 export interface ErrorStateProps {
+  error?: unknown;
   title?: string;
   description?: string;
   icon?: ReactNode;
@@ -14,14 +16,35 @@ export interface ErrorStateProps {
 }
 
 export function ErrorState({
-  title = "Something went wrong",
-  description = "This is usually temporary — check your connection and try again in a moment.",
+  error,
+  title,
+  description,
   icon,
   onRetry,
   isRetrying = false,
   retryLabel = "Try Again",
   className,
 }: ErrorStateProps) {
+  const isNetwork = error ? isNetworkError(error) : false;
+
+  const resolvedTitle =
+    title ??
+    (isNetwork ? "Server is unreachable" : "Something went wrong");
+
+  const resolvedDescription =
+    description ??
+    (isNetwork
+      ? "Unable to connect to the backend server. Please verify your internet connection or ensure the backend is running."
+      : error
+      ? getErrorMessage(error)
+      : "This is usually temporary — check your connection and try again in a moment.");
+
+  const defaultIcon = isNetwork ? (
+    <WifiOff className="w-5 h-5 text-orange-500" aria-hidden="true" />
+  ) : (
+    <AlertTriangle className="w-5 h-5 text-orange-500" aria-hidden="true" />
+  );
+
   return (
     <div
       className={cn(
@@ -30,10 +53,10 @@ export function ErrorState({
       )}
     >
       <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-sm mb-4 dark:bg-slate-800">
-        {icon ?? <WifiOff className="w-5 h-5 text-orange-500" aria-hidden="true" />}
+        {icon ?? defaultIcon}
       </div>
-      <p className="font-semibold text-gray-900 dark:text-slate-100">{title}</p>
-      <p className="text-sm mt-1 text-gray-500 max-w-sm dark:text-slate-400">{description}</p>
+      <p className="font-semibold text-gray-900 dark:text-slate-100">{resolvedTitle}</p>
+      <p className="text-sm mt-1 text-gray-500 max-w-sm dark:text-slate-400">{resolvedDescription}</p>
       {onRetry && (
         <Button variant="outline" onClick={onRetry} isLoading={isRetrying} className="mt-5 font-semibold">
           <RefreshCw className="w-4 h-4" aria-hidden="true" />

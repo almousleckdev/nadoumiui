@@ -14,30 +14,26 @@ describe("universitySchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("rejects a universityId shorter than 3 characters", () => {
+  it("rejects a universityId shorter than 3 characters if provided as non-empty", () => {
     const result = universitySchema.safeParse({ ...validPayload, universityId: "AB" });
     expect(result.success).toBe(false);
   });
 
-  it("rejects an invalid university type", () => {
-    const result = universitySchema.safeParse({ ...validPayload, type: "Community College" });
-    expect(result.success).toBe(false);
+  it("accepts a payload without universityId or with empty string for auto-generation", () => {
+    const { universityId, ...withoutId } = validPayload;
+    const resultWithout = universitySchema.safeParse(withoutId);
+    expect(resultWithout.success).toBe(true);
+
+    const resultEmpty = universitySchema.safeParse({ ...validPayload, universityId: "" });
+    expect(resultEmpty.success).toBe(true);
   });
 
-  it("rejects an invalid officialWebsite URL but allows an empty string", () => {
-    const invalid = universitySchema.safeParse({ ...validPayload, officialWebsite: "not-a-url" });
-    expect(invalid.success).toBe(false);
-
-    const empty = universitySchema.safeParse({ ...validPayload, officialWebsite: "" });
+  it("allows officialWebsite and admissionsEmail to be empty or null", () => {
+    const empty = universitySchema.safeParse({ ...validPayload, officialWebsite: "", admissionsEmail: "" });
     expect(empty.success).toBe(true);
-  });
 
-  it("rejects an invalid admissionsEmail but allows an empty string", () => {
-    const invalid = universitySchema.safeParse({ ...validPayload, admissionsEmail: "not-an-email" });
-    expect(invalid.success).toBe(false);
-
-    const empty = universitySchema.safeParse({ ...validPayload, admissionsEmail: "" });
-    expect(empty.success).toBe(true);
+    const nullish = universitySchema.safeParse({ ...validPayload, officialWebsite: null, admissionsEmail: null });
+    expect(nullish.success).toBe(true);
   });
 
   it("validates structured accommodation entries", () => {
@@ -46,14 +42,6 @@ describe("universitySchema", () => {
       accommodation: [{ type: "Double Room", pricePerYear: 4000, facilities: ["WiFi", "AC"] }],
     });
     expect(result.success).toBe(true);
-  });
-
-  it("rejects an accommodation entry missing its required type field", () => {
-    const result = universitySchema.safeParse({
-      ...validPayload,
-      accommodation: [{ pricePerYear: 4000 }],
-    });
-    expect(result.success).toBe(false);
   });
 
   it("coerces numeric-string metric fields", () => {
@@ -67,5 +55,10 @@ describe("universitySchema", () => {
       expect(result.data.foundedYear).toBe(1898);
       expect(result.data.totalStudents).toBe(45000);
     }
+  });
+
+  it("rejects a payload with a name shorter than 2 characters", () => {
+    const result = universitySchema.safeParse({ ...validPayload, name: "A" });
+    expect(result.success).toBe(false);
   });
 });

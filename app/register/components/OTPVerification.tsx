@@ -151,14 +151,15 @@ export default function OTPVerification({ email, showHeader = false }: OTPVerifi
         <div className="text-center text-sm mt-6">
           <span className="text-gray-500">Didn&apos;t receive the code? </span>
           {canResend ? (
-            <button
+            <Button
               type="button"
+              variant="link"
               onClick={handleResend}
               disabled={isResending}
-              className="font-semibold text-orange-600 hover:text-orange-500 transition-colors"
+              className="p-0 font-semibold hover:text-orange-500"
             >
               {isResending ? "Resending..." : "Resend Code"}
-            </button>
+            </Button>
           ) : (
             <span className="text-gray-400 font-medium">
               Resend in {countdown}s

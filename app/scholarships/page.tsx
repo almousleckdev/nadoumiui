@@ -10,6 +10,8 @@ import FilterBar from "@/components/ui/FilterBar";
 import Pagination from "@/components/ui/Pagination";
 import ErrorState from "@/components/ui/ErrorState";
 import EmptyState from "@/components/ui/EmptyState";
+import { Loading } from "@/components/ui/Loading";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import type { ProgramCategory, ScholarshipCategory } from "@/types";
 
 import { PROGRAM_LEVEL_OPTIONS, SCHOLARSHIP_CATEGORY_OPTIONS as GLOBAL_SCHOLARSHIP_OPTIONS } from "@/data/optionsData";
@@ -43,15 +45,16 @@ function ScholarshipsContent() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(12);
   const [search, setSearch] = useState(initialSearch);
+  const debouncedSearch = useDebouncedValue(search, 400);
   const [programCategory, setProgramCategory] = useState<ProgramCategory | "">("");
   const [category, setCategory] = useState<ScholarshipCategory | "">("");
 
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
-    queryKey: ["scholarships", page, limit, search, programCategory, category],
+    queryKey: ["scholarships", page, limit, debouncedSearch, programCategory, category],
     queryFn: () => getScholarships({
       page,
       limit,
-      search,
+      search: debouncedSearch,
       programCategory: programCategory || undefined,
       scholarshipCategory: category || undefined
     }),
@@ -104,7 +107,7 @@ function ScholarshipsContent() {
         {isLoading && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="animate-pulse bg-white rounded-2xl border border-gray-100 p-6 h-[400px]" />
+              <Loading key={i} variant="skeleton" className="rounded-2xl border border-gray-100 h-[400px]" />
             ))}
           </div>
         )}
@@ -137,7 +140,7 @@ function ScholarshipsContent() {
               totalPages={data.totalPages}
               totalItems={data.total}
               itemsPerPage={limit}
-              pageSizeOptions={[10, 20, 30]}
+              pageSizeOptions={[12, 24, 36]}
               onPageChange={setPage}
               onItemsPerPageChange={(newLimit) => {
                 setLimit(newLimit);
@@ -154,7 +157,7 @@ function ScholarshipsContent() {
 
 export default function ScholarshipsPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 text-center text-gray-900">Loading...</div>}>
+    <Suspense fallback={<Loading variant="page" text="Loading..." />}>
       <ScholarshipsContent />
     </Suspense>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { cn } from "@/utils/cn";
 import Button from "./Button";
+import { Input } from "./Input";
 
 interface TagsInputProps {
   value: string[];
@@ -43,17 +44,16 @@ export function TagsInput({
     <div className={cn("space-y-2", className)}>
       {label && <label className="text-sm font-medium text-gray-900">{label}</label>}
       <div className="flex gap-2">
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          className={cn(
-            "flex-1 rounded-lg border bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500",
-            error ? "border-red-500" : "border-gray-200"
-          )}
-        />
+        <div className="flex-1">
+          <Input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            className={cn("bg-gray-50", error && "border-red-500 focus:ring-red-500")}
+          />
+        </div>
         <Button type="button" variant="outline" onClick={handleAdd}>
           Add
         </Button>
@@ -65,13 +65,15 @@ export function TagsInput({
             className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-3 py-1 text-sm text-orange-800 border border-orange-200"
           >
             {item}
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={() => handleRemove(index)}
-              className="ml-1 rounded-full p-0.5 hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="ml-1 w-4 h-4 rounded-full text-orange-800 hover:bg-orange-200 hover:text-orange-900"
             >
               ×
-            </button>
+            </Button>
           </span>
         ))}
       </div>

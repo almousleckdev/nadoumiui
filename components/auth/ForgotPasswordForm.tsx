@@ -6,6 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import { OTPInput } from "@/components/auth/OTPInput";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { passwordRule } from "@/lib/validations/password";
 import { toast } from "react-hot-toast";
 import { CheckCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
@@ -19,8 +20,8 @@ const emailSchema = z.object({
 
 const otpSchema = z.object({
   otp: z.string().length(6, "OTP must be exactly 6 characters"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string().min(8, "Confirm your password"),
+  password: passwordRule,
+  confirmPassword: z.string().min(1, "Confirm your password"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -35,7 +36,7 @@ export interface ForgotPasswordFormProps {
   useOtp?: boolean;
   loginUrl: string;
   onSendEmail: (email: string) => Promise<void>;
-  onVerifyOtpAndReset?: (otp: string, password: string) => Promise<void>;
+  onVerifyOtpAndReset?: (otp: string, password: string, email: string) => Promise<void>;
   onSuccessRedirect?: () => void;
 }
 
@@ -80,7 +81,7 @@ export function ForgotPasswordForm({
     if (!onVerifyOtpAndReset) return;
     setServerError("");
     try {
-      await onVerifyOtpAndReset(data.otp, data.password);
+      await onVerifyOtpAndReset(data.otp, data.password, registeredEmail);
       toast.success("Password reset successfully! Please log in.");
       if (onSuccessRedirect) onSuccessRedirect();
     } catch (err) {

@@ -11,6 +11,7 @@ import "react-phone-number-input/style.css";
 import { getStudentProfile, updateStudentProfile, updateProfilePicture } from "@/services/authService";
 import Card from "@/components/ui/Card";
 import ErrorState from "@/components/ui/ErrorState";
+import { Loading } from "@/components/ui/Loading";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { updateProfileSchema, type ProfileFormValues } from "./schema";
 import { ProfileSidebarCard, type ProfileTab } from "./ProfileSidebarCard";
@@ -118,9 +119,9 @@ export default function StudentProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 animate-pulse p-6">
-        <div className="h-10 bg-gray-200 rounded-lg w-1/4" />
-        <div className="h-[500px] bg-gray-200 rounded-xl" />
+      <div className="space-y-6 p-6">
+        <Loading variant="skeleton" className="h-10 rounded-lg w-1/4" />
+        <Loading variant="skeleton" className="h-[500px] rounded-xl" />
       </div>
     );
   }

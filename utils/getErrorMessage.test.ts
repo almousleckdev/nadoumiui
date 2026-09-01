@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { AxiosError, AxiosHeaders } from "axios";
-import { getErrorMessage, getErrorStatus } from "./getErrorMessage";
+import { getErrorMessage, getErrorStatus, isNetworkError } from "./getErrorMessage";
 
 function makeAxiosError(status: number, data: unknown): AxiosError {
   return new AxiosError("Request failed", "ERR_BAD_REQUEST", undefined, undefined, {
@@ -10,6 +10,11 @@ function makeAxiosError(status: number, data: unknown): AxiosError {
     config: { headers: new AxiosHeaders() },
     data,
   });
+}
+
+function makeNetworkError(): AxiosError {
+  const err = new AxiosError("Network Error", "ERR_NETWORK");
+  return err;
 }
 
 describe("getErrorMessage", () => {
@@ -23,21 +28,36 @@ describe("getErrorMessage", () => {
     expect(getErrorMessage(error)).toBe("Legacy shape message");
   });
 
-  it("falls back to the axios error message when there's no response body message", () => {
+  it("returns clean status message for 500 when there's no response body message", () => {
     const error = makeAxiosError(500, {});
-    expect(getErrorMessage(error)).toBe("Request failed");
+    expect(getErrorMessage(error)).toBe("A server error occurred. Please try again later.");
+  });
+
+  it("returns user-friendly connection message for ERR_NETWORK", () => {
+    const error = makeNetworkError();
+    expect(getErrorMessage(error)).toBe("Unable to connect to the server. Please verify your connection or check if the backend is running.");
   });
 
   it("handles a plain Error", () => {
     expect(getErrorMessage(new Error("Plain failure"))).toBe("Plain failure");
   });
 
-  it("falls back to the default message for a non-Error value", () => {
-    expect(getErrorMessage("just a string")).toBe("Something went wrong. Please try again.");
+  it("handles string error messages directly", () => {
+    expect(getErrorMessage("Custom error string")).toBe("Custom error string");
   });
 
-  it("supports a custom fallback message", () => {
-    expect(getErrorMessage("oops", "Custom fallback")).toBe("Custom fallback");
+  it("supports a custom fallback message for unknown objects", () => {
+    expect(getErrorMessage({}, "Custom fallback")).toBe("Custom fallback");
+  });
+});
+
+describe("isNetworkError", () => {
+  it("returns true for Axios ERR_NETWORK errors", () => {
+    expect(isNetworkError(makeNetworkError())).toBe(true);
+  });
+
+  it("returns false for HTTP 400 responses", () => {
+    expect(isNetworkError(makeAxiosError(400, {}))).toBe(false);
   });
 });
 

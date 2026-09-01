@@ -47,9 +47,9 @@ export default function ContactForm() {
         </div>
         <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent</h3>
         <p className="text-gray-600">We&apos;ve received your inquiry and will be in touch shortly.</p>
-        <button onClick={() => reset()} className="mt-6 text-orange-600 font-semibold hover:text-orange-700">
+        <Button type="button" variant="link" onClick={() => reset()} className="mt-6 p-0">
           Send another message
-        </button>
+        </Button>
       </div>
     );
   }

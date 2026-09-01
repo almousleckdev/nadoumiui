@@ -6,7 +6,7 @@ import { getAdminApplicationColumns } from "@/features/applications/components/A
 import { AdminUpdateStatusModal } from "@/features/applications/components/AdminUpdateStatusModal";
 import { DataTable } from "@/components/ui/DataTable";
 import Card from "@/components/ui/Card";
-import Select from "@/components/ui/Select";
+import FilterBar from "@/components/ui/FilterBar";
 import Pagination from "@/components/ui/Pagination";
 import Loading from "@/components/ui/Loading";
 import ErrorState from "@/components/ui/ErrorState";
@@ -66,17 +66,18 @@ export default function AdminApplicationsPage() {
       </div>
 
       {/* Filter Bar */}
-      <div className="flex gap-4 max-w-xs">
-        <div className="w-full">
-          <Select
-            label="Filter by Status"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            options={statusOptions}
-            className="bg-white border-gray-200 text-gray-800"
-          />
-        </div>
-      </div>
+      <FilterBar
+        filters={[
+          {
+            key: "status",
+            label: "Filter by Status",
+            options: statusOptions,
+            value: statusFilter,
+            onChange: setStatusFilter,
+          },
+        ]}
+        onClear={() => setStatusFilter("")}
+      />
 
       {error ? (
         <ErrorState

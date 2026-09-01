@@ -1,8 +1,9 @@
 import { Controller, useFormContext } from "react-hook-form";
-import Select from "react-select";
+import ReactSelect from "react-select";
 import PhoneInput from "react-phone-number-input";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
+import { Select } from "@/components/ui/Select";
 import type { ProfileFormValues } from "../schema";
 import { GENDER_OPTIONS } from "../schema";
 
@@ -48,7 +49,7 @@ export function GeneralTab({ countries, isSaving }: GeneralTabProps) {
             name="country"
             control={control}
             render={({ field }) => (
-              <Select
+              <ReactSelect
                 {...field}
                 options={countries}
                 value={countries.find((c) => c.label === field.value)}
@@ -62,22 +63,19 @@ export function GeneralTab({ countries, isSaving }: GeneralTabProps) {
         <Input label="City" {...register("city")} error={errors.city?.message} />
         <Input label="Passport Number" {...register("passportNumber")} error={errors.passportNumber?.message} />
 
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Gender</label>
-          <Controller
-            name="gender"
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                options={GENDER_OPTIONS}
-                value={GENDER_OPTIONS.find((o) => o.value === field.value)}
-                onChange={(val) => field.onChange(val?.value)}
-              />
-            )}
-          />
-          {errors.gender && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.gender.message}</p>}
-        </div>
+        <Controller
+          name="gender"
+          control={control}
+          render={({ field }) => (
+            <Select
+              label="Gender"
+              options={GENDER_OPTIONS}
+              value={field.value ?? ""}
+              onChange={(e) => field.onChange(e.target.value)}
+              error={errors.gender?.message}
+            />
+          )}
+        />
 
         <Input
           type="date"

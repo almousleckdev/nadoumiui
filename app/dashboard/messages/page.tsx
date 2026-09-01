@@ -13,6 +13,7 @@ import {
 } from "@/services/messageService";
 import Card from "@/components/ui/Card";
 import ErrorState from "@/components/ui/ErrorState";
+import { Loading } from "@/components/ui/Loading";
 import { FileText, MessageSquare } from "lucide-react";
 import type { Conversation, Message, Admin } from "@/types";
 import { useConversationSocket } from "@/features/messages/hooks/useConversationSocket";
@@ -164,7 +165,7 @@ function StudentChatWorkspace() {
 
         <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
           {isConvLoading ? (
-            <div className="text-center py-12 text-gray-400 text-xs animate-pulse">Loading your messages...</div>
+            <Loading text="Loading your messages..." className="py-12" />
           ) : convError ? (
             <ErrorState
               title="Couldn't load conversations"
@@ -264,7 +265,7 @@ function StudentChatWorkspace() {
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
               {isMessagesLoading ? (
-                <div className="text-center py-12 text-gray-400 text-xs">Loading chat history...</div>
+                <Loading text="Loading chat history..." className="py-12" />
               ) : messagesError ? (
                 <ErrorState
                   title="Couldn't load this conversation"
@@ -322,7 +323,7 @@ export default function StudentMessagesPage() {
         </p>
       </div>
 
-      <Suspense fallback={<div className="text-center py-12 text-gray-400">Loading support chat workspace...</div>}>
+      <Suspense fallback={<Loading text="Loading support chat workspace..." className="py-12" />}>
         <StudentChatWorkspace />
       </Suspense>
     </div>

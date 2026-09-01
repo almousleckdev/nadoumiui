@@ -36,4 +36,9 @@ describe("resolveDocumentUrl", () => {
       "https://nadoumibackend.up.railway.app/uploads/file.pdf",
     );
   });
+
+  it("falls back to localhost:3002 when NEXT_PUBLIC_API_URL is unset", () => {
+    delete process.env.NEXT_PUBLIC_API_URL;
+    expect(resolveDocumentUrl("/uploads/file.pdf")).toBe("http://localhost:3002/uploads/file.pdf");
+  });
 });

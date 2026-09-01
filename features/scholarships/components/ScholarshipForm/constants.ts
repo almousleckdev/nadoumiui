@@ -9,6 +9,80 @@ export const SCHOLARSHIP_FORM_TABS = [
 
 export type ScholarshipFormTabId = (typeof SCHOLARSHIP_FORM_TABS)[number]["id"];
 
+export const SCHOLARSHIP_TAB_FIELD_MAP: Record<ScholarshipFormTabId, string[]> = {
+  basic: [
+    "title",
+    "titleInChinese",
+    "scholarshipCategory",
+    "programCategories",
+    "applicationDeadline",
+    "startDate",
+    "universities",
+    "programSelection",
+    "field",
+    "programName",
+    "degree",
+    "duration",
+    "scholarshipDuration",
+    "scholarshipDurationText",
+    "intake",
+    "teachingLanguage",
+  ],
+  academic: [
+    "gpaMin",
+    "ieltsScore",
+    "toeflScore",
+    "duolingoScore",
+    "hskLevel",
+    "highestDegreeRequired",
+    "ranking",
+  ],
+  eligibility: [
+    "ageMin",
+    "ageMax",
+    "acceptedCountries",
+    "targetNationalities",
+    "applicantRequirements",
+    "applicationDocuments",
+    "additionalDocuments",
+  ],
+  financials: [
+    "originalTuitionFee",
+    "tuitionFeeAfterScholarship",
+    "hasStipend",
+    "stipendAmount",
+    "stipendUnit",
+    "stipend",
+    "applicationFee",
+    "serviceFee",
+    "visaFee",
+    "insurance",
+    "accommodationFee",
+    "feeStructure",
+    "additionalFees",
+  ],
+  details: ["description", "benefits", "requirements", "specialNotes", "tags"],
+  publish: [
+    "coverImage",
+    "status",
+    "availableSlots",
+    "isRecommended",
+    "isHot",
+    "isTop",
+    "recommendationNotes",
+  ],
+};
+
+export function getScholarshipTabForField(fieldName: string): { id: ScholarshipFormTabId; label: string } {
+  for (const tab of SCHOLARSHIP_FORM_TABS) {
+    const fields = SCHOLARSHIP_TAB_FIELD_MAP[tab.id] || [];
+    if (fields.some((f) => fieldName === f || fieldName.startsWith(`${f}.`))) {
+      return tab;
+    }
+  }
+  return SCHOLARSHIP_FORM_TABS[0];
+}
+
 export const SCHOLARSHIP_CATEGORY_OPTIONS = [
   { value: "CSC", label: "CSC (Government)" },
   { value: "Province", label: "Province Scholarship" },

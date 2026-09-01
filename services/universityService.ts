@@ -44,6 +44,15 @@ export async function getUniversityById(id: string): Promise<University> {
   return data.data;
 }
 
+// GET /api/universities/generate-id (Admin only)
+export async function reserveUniversityId(name?: string): Promise<string> {
+  const { data } = await apiClient.get<ApiResponse<{ universityId: string }>>(
+    "/universities/generate-id",
+    { params: name ? { name } : undefined },
+  );
+  return data.data.universityId;
+}
+
 // POST /api/universities (Admin only)
 export async function createUniversity(
   payload: Partial<University>,

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { passwordRule } from "@/lib/validations/password";
 
 export const CURRENT_LEVEL_OPTIONS = [
   { value: "High School", label: "High School" },
@@ -59,8 +60,8 @@ export const registerSchema = z
     desiredField: z.string().min(1, "Desired field of study is required"),
     preferredCities: z.array(z.string()).min(1, "Select at least one preferred city"),
 
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Please confirm your password"),
+    password: passwordRule,
+    confirmPassword: z.string().min(1, "Please confirm your password"),
     terms: z.literal(true, { message: "You must accept the terms and conditions" }),
     accuracy: z.literal(true, { message: "You must confirm all information is accurate" }),
   })

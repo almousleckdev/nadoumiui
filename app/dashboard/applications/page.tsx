@@ -10,6 +10,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Pagination from "@/components/ui/Pagination";
 import ErrorState from "@/components/ui/ErrorState";
+import { Loading } from "@/components/ui/Loading";
 import type { Application } from "@/types";
 import { FileText } from "lucide-react";
 
@@ -27,9 +28,9 @@ export default function StudentApplicationsPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-10 bg-gray-200 rounded-lg w-1/4" />
-        <div className="h-96 bg-gray-200 rounded-xl" />
+      <div className="space-y-6">
+        <Loading variant="skeleton" className="h-10 rounded-lg w-1/4" />
+        <Loading variant="skeleton" className="h-96 rounded-xl" />
       </div>
     );
   }

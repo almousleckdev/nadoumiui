@@ -18,15 +18,26 @@ export function Footer({ className }: FooterProps) {
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           {/* Column 1 — Logo & About */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <Link href="/" className="inline-flex items-center focus-ring transition-transform hover:scale-105 bg-white p-2 rounded-xl">
-              <div className="relative h-10 w-32 overflow-hidden flex items-center">
-                 <Image 
-                   src="/logo/logo.jpg" 
-                   alt="Nadoumi Consulting Logo" 
-                   fill
-                   sizes="(max-width: 768px) 160px, 160px"
-                   className="object-contain object-left"
-                 />
+            <Link
+              href="/"
+              className="inline-flex items-center gap-3 focus-ring group transition-transform hover:scale-[1.02]"
+            >
+              <div className="relative h-11 w-11 rounded-xl bg-white p-1 overflow-hidden shadow-sm shrink-0 border border-slate-700/50">
+                <Image
+                  src="/logo/logo.jpg"
+                  alt="Nadoumi Consulting Logo"
+                  fill
+                  sizes="44px"
+                  className="object-contain"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-heading text-lg font-extrabold text-white tracking-tight leading-none group-hover:text-orange-400 transition-colors">
+                  Nadoumi
+                </span>
+                <span className="text-[10px] font-bold text-orange-400 uppercase tracking-wider leading-none mt-1">
+                  Education Consulting
+                </span>
               </div>
             </Link>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-gray-400">

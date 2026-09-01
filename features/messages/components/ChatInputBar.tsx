@@ -1,12 +1,13 @@
 import type { RefObject } from "react";
 import { Paperclip } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { Loading } from "@/components/ui/Loading";
 
 const VARIANT_STYLES = {
   student: {
     container: "p-4 border-t border-gray-100 bg-white",
     attachButton: "p-2.5 bg-gray-100 text-gray-500 rounded-xl hover:bg-gray-200 transition-colors focus-ring disabled:opacity-50",
-    spinner: "w-5 h-5 rounded-full border-2 border-gray-500 border-t-transparent animate-spin",
+    spinnerClassName: "w-5 h-5 text-gray-500",
     textInput:
       "flex-1 bg-gray-50 border border-gray-200 text-gray-800 rounded-xl px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500",
     placeholder: "Type your message...",
@@ -16,7 +17,7 @@ const VARIANT_STYLES = {
     container: "p-4 border-t border-gray-200 bg-gray-50",
     attachButton:
       "p-2.5 bg-white text-gray-500 rounded-xl hover:bg-gray-100 hover:text-gray-900 transition-colors focus-ring disabled:opacity-50",
-    spinner: "w-5 h-5 rounded-full border-2 border-slate-400 border-t-transparent animate-spin",
+    spinnerClassName: "w-5 h-5 text-slate-400",
     textInput:
       "flex-1 bg-white border border-gray-200 text-gray-900 rounded-xl px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500",
     placeholder: "Type a message...",
@@ -68,7 +69,7 @@ export function ChatInputBar({
           className={styles.attachButton}
           title="Upload picture or file"
         >
-          {isUploading ? <div className={styles.spinner} /> : <Paperclip className="w-5 h-5" />}
+          {isUploading ? <Loading variant="icon" className={styles.spinnerClassName} /> : <Paperclip className="w-5 h-5" />}
         </button>
 
         <input

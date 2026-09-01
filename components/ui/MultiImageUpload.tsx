@@ -2,8 +2,10 @@ import React, { useState, useRef } from "react";
 import { cn } from "@/utils/cn";
 import { X, PlusCircle } from "lucide-react";
 import Image from "next/image";
+import { toast } from "react-hot-toast";
 import { resolveDocumentUrl } from "@/utils/resolveUrl";
 import { uploadMediaAsset } from "@/services/mediaService";
+import { Loading } from "@/components/ui/Loading";
 
 interface MultiImageUploadProps {
   value: string[];
@@ -37,7 +39,7 @@ export function MultiImageUpload({
       onChange([...value, ...newUrls]);
     } catch (err) {
       console.error("Multi-image upload failed:", err);
-      alert("Failed to upload some images. Please try again.");
+      toast.error("Failed to upload some images. Please try again.");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -86,7 +88,7 @@ export function MultiImageUpload({
           )}
         >
           {isUploading ? (
-            <div className="w-6 h-6 rounded-full border-2 border-gray-400 border-t-transparent animate-spin mb-2" />
+            <Loading variant="icon" className="w-6 h-6 text-gray-400 mb-2" />
           ) : (
             <PlusCircle className="w-6 h-6 text-gray-400 mb-2" />
           )}

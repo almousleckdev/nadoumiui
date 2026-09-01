@@ -38,16 +38,24 @@ export function Navbar() {
       >
         {/* Logo Section */}
         <div className="flex shrink-0 items-center">
-          <Link href="/" className="flex items-center gap-2 focus-ring group transition-transform duration-300 hover:scale-[1.02]">
-            <div className="relative h-10 w-32 sm:w-36 sm:h-11 overflow-hidden flex items-center">
+          <Link href="/" className="flex items-center gap-2.5 focus-ring group transition-transform duration-300 hover:scale-[1.02]">
+            <div className="relative h-9 w-9 sm:h-10 sm:w-10 overflow-hidden flex items-center justify-center shrink-0">
                <Image 
                  src="/logo/logo.jpg" 
                  alt="Nadoumi Consulting Logo" 
                  fill
-                 sizes="(max-width: 768px) 128px, 144px"
-                 className="object-contain object-left mix-blend-multiply"
+                 sizes="40px"
+                 className="object-contain mix-blend-multiply"
                  priority
                />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-heading font-extrabold text-base sm:text-lg text-gray-900 tracking-tight leading-none group-hover:text-orange-600 transition-colors">
+                Nadoumi
+              </span>
+              <span className="text-[9px] sm:text-[10px] font-bold text-orange-600 uppercase tracking-wider leading-none mt-0.5">
+                Consulting
+              </span>
             </div>
           </Link>
         </div>

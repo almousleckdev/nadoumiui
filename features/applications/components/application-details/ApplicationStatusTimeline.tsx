@@ -1,5 +1,5 @@
 import type { Application } from "@/types";
-import Badge from "@/components/ui/Badge";
+import { ApplicationStatusBadge } from "@/components/ui/ApplicationStatusBadge";
 
 export function ApplicationStatusTimeline({ statusHistory }: { statusHistory: Application["statusHistory"] }) {
   if (!Array.isArray(statusHistory) || statusHistory.length === 0) {
@@ -21,12 +21,7 @@ export function ApplicationStatusTimeline({ statusHistory }: { statusHistory: Ap
             <div className="absolute -left-[21px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-orange-600" />
             <div>
               <div className="flex items-center gap-2">
-                <Badge
-                  size="sm"
-                  variant={log.status === "accepted" ? "success" : log.status === "rejected" ? "danger" : "info"}
-                >
-                  {log.status.replace("_", " ")}
-                </Badge>
+                <ApplicationStatusBadge status={log.status} size="sm" />
                 <span className="text-[10px] text-gray-400 font-mono">{logDate}</span>
               </div>
               {log.note && <p className="text-xs text-gray-500 mt-1 pl-1 italic">&ldquo;{log.note}&rdquo;</p>}

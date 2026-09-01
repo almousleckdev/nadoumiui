@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import Button from "@/components/ui/Button";
 import ErrorState from "@/components/ui/ErrorState";
 import EmptyState from "@/components/ui/EmptyState";
+import { Loading } from "@/components/ui/Loading";
 
 interface HomeShowcaseSectionProps<T> {
   title: string;
@@ -68,10 +69,7 @@ export function HomeShowcaseSection<T>({
         {isLoading && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {Array.from({ length: itemCount }).map((_, i) => (
-              <div
-                key={i}
-                className="animate-pulse bg-gray-50 rounded-2xl border border-gray-100 p-6 h-[400px]"
-              />
+              <Loading key={i} variant="skeleton" className="rounded-2xl border border-gray-100 h-[400px]" />
             ))}
           </div>
         )}

@@ -43,20 +43,33 @@ apiClient.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error),
 );
 
-//Response Interceptor: normalize errors
+//Response Interceptor: normalize errors and provide actionable notifications
 apiClient.interceptors.response.use(
   (response) => response,
-  (error: AxiosError<{ message?: string }>) => {
+  (error: AxiosError<{ message?: string; error?: { message?: string } }>) => {
     if (typeof window !== "undefined") {
       const isAuthEndpoint = error.config?.url?.match(/login|register|forgot-password|reset-password/i);
-      
-      if (error.response?.status === 401 && !isAuthEndpoint) {
-        window.dispatchEvent(new CustomEvent("auth:unauthorized"));
-        toast.error("Session expired. Please log in again.");
-      } else if (error.response?.status === 403) {
-        toast.error("You do not have permission to perform this action.");
-      } else if (error.response?.status && error.response.status >= 500) {
-        toast.error("A server error occurred. Please try again later.");
+
+      if (!error.response) {
+        // Network connection failure / ERR_CONNECTION_REFUSED / Offline
+        if (error.code === "ECONNABORTED") {
+          toast.error("Request timed out. Please check your internet connection.", { id: "network-timeout" });
+        } else {
+          toast.error("Unable to connect to the server. Please verify the backend is running.", { id: "network-error" });
+        }
+      } else if (error.response.status === 401 && !isAuthEndpoint) {
+        const pathname = window.location.pathname;
+        if (pathname.startsWith("/dashboard") || pathname.startsWith("/admin/dashboard")) {
+          toast.error("Session expired. Please log in again.", { id: "session-expired" });
+        }
+      } else if (error.response.status === 403) {
+        toast.error("You do not have permission to perform this action.", { id: "forbidden-error" });
+      } else if (error.response.status === 429) {
+        toast.error("Too many requests. Please wait a moment before trying again.", { id: "rate-limit-error" });
+      } else if (error.response.status === 502 || error.response.status === 503 || error.response.status === 504) {
+        toast.error("Backend service is temporarily unavailable. Please try again shortly.", { id: "service-unavailable" });
+      } else if (error.response.status >= 500) {
+        toast.error("A server error occurred. Please try again later.", { id: "server-error" });
       }
     }
     return Promise.reject(error);

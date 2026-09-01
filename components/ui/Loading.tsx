@@ -2,7 +2,7 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 export interface LoadingProps {
-  variant?: "spinner" | "page" | "overlay" | "skeleton";
+  variant?: "spinner" | "page" | "overlay" | "skeleton" | "icon";
   text?: string;
   className?: string;
 }
@@ -12,6 +12,12 @@ export function Loading({ variant = "spinner", text, className }: LoadingProps) 
     return (
       <div className={cn("animate-pulse bg-gray-200 dark:bg-slate-800 rounded-md", className)} />
     );
+  }
+
+  if (variant === "icon") {
+    // Bare rotating icon, no wrapper/text — for embedding inline in buttons,
+    // badges, or other compact spaces the other variants' padding doesn't fit.
+    return <Loader2 className={cn("w-5 h-5 animate-spin text-orange-600 dark:text-orange-500", className)} />;
   }
 
   if (variant === "overlay") {

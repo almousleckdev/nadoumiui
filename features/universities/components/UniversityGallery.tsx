@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
@@ -11,24 +11,38 @@ interface UniversityGalleryProps {
 export function UniversityGallery({ images }: UniversityGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 
-  if (!images || images.length === 0) return null;
-
   const openLightbox = (index: number) => setSelectedImageIndex(index);
   const closeLightbox = () => setSelectedImageIndex(null);
-  
-  const showNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (selectedImageIndex !== null) {
-      setSelectedImageIndex((selectedImageIndex + 1) % images.length);
-    }
-  };
 
-  const showPrev = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (selectedImageIndex !== null) {
-      setSelectedImageIndex((selectedImageIndex - 1 + images.length) % images.length);
-    }
-  };
+  const showNext = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      setSelectedImageIndex((prev) => (prev === null ? null : (prev + 1) % images.length));
+    },
+    [images.length]
+  );
+
+  const showPrev = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      setSelectedImageIndex((prev) => (prev === null ? null : (prev - 1 + images.length) % images.length));
+    },
+    [images.length]
+  );
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedImageIndex === null) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowRight") showNext();
+      if (e.key === "ArrowLeft") showPrev();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedImageIndex, showNext, showPrev]);
+
+  if (!images || images.length === 0) return null;
 
   return (
     <>

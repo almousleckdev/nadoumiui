@@ -2,9 +2,9 @@ import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/utils/cn";
 
-// Types   
-type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger";
-type ButtonSize = "sm" | "md" | "lg";
+// Types
+type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger" | "link";
+type ButtonSize = "sm" | "md" | "lg" | "icon";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -25,12 +25,19 @@ const variantStyles: Record<ButtonVariant, string> = {
     "bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus-visible:ring-orange-500 dark:text-slate-400 dark:hover:bg-slate-800 dark:active:bg-slate-700 dark:hover:text-slate-200",
   danger:
     "bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus-visible:ring-red-500 dark:bg-red-500/10 dark:text-red-500 dark:hover:bg-red-500/20",
+  // Note: sizeStyles' padding is applied after this and wins via twMerge, so
+  // consumers should pass className="p-0" (or size="icon") to go padding-free.
+  link:
+    "bg-transparent rounded-none text-orange-600 hover:text-orange-700 active:text-orange-800 focus-visible:ring-orange-500 dark:text-orange-500 dark:hover:text-orange-400",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
   sm: "px-2.5 py-1.5 text-xs gap-1.5",
   md: "px-4 py-1.5 text-sm gap-2",
   lg: "px-5 py-2.5 text-sm gap-2 font-semibold",
+  // Fixed square footprint for icon-only buttons (compact page-number pills,
+  // remove/close glyphs) — sm/md/lg's padding-based sizing can't produce this.
+  icon: "w-8 h-8 p-0 gap-0",
 };
 
 function Spinner({ className }: { className?: string }) {

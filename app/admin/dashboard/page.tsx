@@ -8,6 +8,7 @@ import { adminDashboardRecentApplicationColumns } from "@/features/applications/
 import { DataTable } from "@/components/ui/DataTable";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import { MetricCard } from "@/components/ui/MetricCard";
 import Loading from "@/components/ui/Loading";
 import ErrorState from "@/components/ui/ErrorState";
 import EmptyState from "@/components/ui/EmptyState";
@@ -54,17 +55,13 @@ export default function AdminDashboardOverviewPage() {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
         {kpis.map((kpi, index) => (
-          <Card key={index} className="p-6">
-            <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center border ${kpi.color}`}>
-                {kpi.icon}
-              </div>
-              <div>
-                <span className="text-xs font-semibold text-gray-500 block">{kpi.label}</span>
-                <span className="text-2xl font-bold text-gray-900 mt-1 block font-heading">{kpi.value}</span>
-              </div>
-            </div>
-          </Card>
+          <MetricCard
+            key={index}
+            label={kpi.label}
+            value={kpi.value}
+            icon={kpi.icon}
+            iconClassName={kpi.color}
+          />
         ))}
       </div>
 

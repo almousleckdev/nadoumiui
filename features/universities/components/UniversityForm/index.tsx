@@ -3,13 +3,19 @@
 import { useState, useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { uploadMediaAsset } from "@/services/mediaService";
 import { universitySchema, type UniversityFormValues } from "@/lib/validations/university";
 import { toast } from "react-hot-toast";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import { useTabErrorCount } from "@/hooks/useTabErrorCount";
 
 import Button from "@/components/ui/Button";
-import { cn } from "@/utils/cn";
-import { UNIVERSITY_FORM_TABS, type UniversityFormTabId } from "./constants";
+import { SidebarTabs } from "@/components/ui/SidebarTabs";
+import {
+  UNIVERSITY_FORM_TABS,
+  UNIVERSITY_TAB_FIELD_MAP,
+  getTabForField,
+  type UniversityFormTabId,
+} from "./constants";
 import { BasicInfoTab } from "./tabs/BasicInfoTab";
 import { AcademicsTab } from "./tabs/AcademicsTab";
 import { ContentTab } from "./tabs/ContentTab";
@@ -17,6 +23,7 @@ import { AccommodationTab } from "./tabs/AccommodationTab";
 import { DocumentsTab } from "./tabs/DocumentsTab";
 import { MediaTab } from "./tabs/MediaTab";
 import { PublishTab } from "./tabs/PublishTab";
+import { AlertCircle } from "lucide-react";
 
 export interface UniversityFormProps {
   initialData?: any;
@@ -42,10 +49,6 @@ export function UniversityForm({
   onCancel,
 }: UniversityFormProps) {
   const [activeTab, setActiveTab] = useState<UniversityFormTabId>("basic");
-
-  // Media Upload States for single files
-  const [isLogoUploading, setIsLogoUploading] = useState(false);
-  const [isBannerUploading, setIsBannerUploading] = useState(false);
 
   const form = useForm<UniversityFormValues>({
     resolver: zodResolver(universitySchema) as any,
@@ -88,30 +91,29 @@ export function UniversityForm({
     }
   }, [initialData, reset]);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: "logo" | "banner") => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const logoUpload = useImageUpload(setValue, "logo", "universities/logos", "logo");
+  const bannerUpload = useImageUpload(setValue, "bannerImage", "universities/banners", "banner");
+  const isLogoUploading = logoUpload.isUploading;
+  const isBannerUploading = bannerUpload.isUploading;
 
-    try {
-      if (target === "logo") {
-        setIsLogoUploading(true);
-        const res = await uploadMediaAsset(file, "universities/logos");
-        setValue("logo", res.url, { shouldValidate: true });
-      } else {
-        setIsBannerUploading(true);
-        const res = await uploadMediaAsset(file, "universities/banners");
-        setValue("bannerImage", res.url, { shouldValidate: true });
-      }
-    } catch (err) {
-      console.error(`${target} upload failed:`, err);
-      toast.error(`Failed to upload ${target}. Please try again.`);
-    } finally {
-      if (target === "logo") setIsLogoUploading(false);
-      else setIsBannerUploading(false);
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, target: "logo" | "banner") =>
+    target === "logo" ? logoUpload.handleUpload(e) : bannerUpload.handleUpload(e);
+
+  const onInvalid = (fieldErrors: any) => {
+    console.error("University form validation errors:", fieldErrors);
+    toast.error("Please fix the validation errors in the highlighted tabs.");
+
+    // Auto-switch to the first tab that has an error
+    const firstErrorKey = Object.keys(fieldErrors)[0];
+    if (firstErrorKey) {
+      const targetTab = getTabForField(firstErrorKey);
+      setActiveTab(targetTab.id);
     }
   };
 
-  const handleFormSubmit = handleSubmit((data) => onSubmit(data as any));
+  const handleFormSubmit = handleSubmit((data) => onSubmit(data as any), onInvalid);
+
+  const getTabErrorCount = useTabErrorCount<UniversityFormTabId>(errors, UNIVERSITY_TAB_FIELD_MAP);
 
   return (
     <FormProvider {...form}>
@@ -132,36 +134,62 @@ export function UniversityForm({
           </div>
         </div>
 
+        {/* Backend / Network Error Banner */}
         {isError && (
-          <div className="p-4 rounded-xl bg-red-950/40 border border-red-900/60 text-sm text-red-400 font-medium">
-            {errorMessage || "An error occurred."}
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-800 font-medium flex items-center gap-2 shadow-xs">
+            <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+            <div>
+              <span className="font-bold text-rose-900">Submission Error: </span>
+              <span>{errorMessage || "An error occurred during submission."}</span>
+            </div>
           </div>
         )}
 
+        {/* Form Validation Errors Banner */}
         {Object.keys(errors).length > 0 && (
-          <div className="p-4 rounded-xl bg-orange-950/40 border border-orange-900/60 text-sm text-orange-400 font-medium">
-            Please fix the validation errors in the form before submitting.
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 shadow-sm space-y-3">
+            <div className="flex items-center gap-2 font-bold text-sm text-rose-800">
+              <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+              <span>Please resolve the following validation errors before submitting:</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              {Object.entries(errors).map(([key, err]) => {
+                const tab = getTabForField(key);
+                const message = (err as any)?.message || "Required / Invalid format";
+                return (
+                  <button
+                    type="button"
+                    key={key}
+                    onClick={() => setActiveTab(tab.id)}
+                    className="flex items-start justify-between p-2.5 bg-white rounded-lg border border-rose-200 hover:border-rose-400 cursor-pointer transition-colors group shadow-2xs text-left w-full"
+                  >
+                    <div>
+                      <span className="font-semibold text-gray-500 uppercase tracking-wider text-[10px] block">
+                        Tab: {tab.label}
+                      </span>
+                      <span className="font-bold text-rose-700 capitalize">
+                        {key.replace(/([A-Z])/g, " $1")}:
+                      </span>{" "}
+                      <span className="text-gray-700">{message}</span>
+                    </div>
+                    <span className="text-[11px] font-bold text-orange-600 group-hover:underline shrink-0 ml-2 mt-0.5">
+                      Fix &rarr;
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
 
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar Tabs */}
-          <div className="w-full md:w-64 shrink-0 space-y-1">
-            {UNIVERSITY_FORM_TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition-colors duration-200",
-                  activeTab === tab.id
-                    ? "bg-gray-100 text-gray-900"
-                    : "text-gray-500 hover:bg-white hover:text-gray-800",
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          <SidebarTabs
+            tabs={UNIVERSITY_FORM_TABS}
+            activeTab={activeTab}
+            onChange={setActiveTab}
+            getErrorCount={getTabErrorCount}
+          />
 
           {/* Main Content Area */}
           <div className="flex-1">

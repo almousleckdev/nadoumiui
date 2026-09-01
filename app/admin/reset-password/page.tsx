@@ -2,10 +2,11 @@
 
 import React, { Suspense } from "react";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
+import { Loading } from "@/components/ui/Loading";
 
 export default function AdminResetPasswordPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 text-center text-white">Loading...</div>}>
+    <Suspense fallback={<Loading variant="page" text="Loading..." />}>
       <ResetPasswordForm
         apiEndpoint="/admin/reset-password"
         loginUrl="/admin/login"

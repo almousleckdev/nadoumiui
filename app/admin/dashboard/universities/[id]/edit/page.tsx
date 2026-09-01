@@ -9,6 +9,8 @@ import Loading from "@/components/ui/Loading";
 import ErrorState from "@/components/ui/ErrorState";
 import { toast } from "react-hot-toast";
 
+import { getErrorMessage } from "@/utils/getErrorMessage";
+
 export default function EditUniversityPage() {
   const router = useRouter();
   const { id } = useParams() as { id: string };
@@ -34,8 +36,8 @@ export default function EditUniversityPage() {
       toast.success("University updated successfully!");
       router.push("/admin/dashboard/universities");
     },
-    onError: () => {
-      toast.error("Failed to update university");
+    onError: (err: unknown) => {
+      toast.error(getErrorMessage(err));
     }
   });
 
@@ -72,7 +74,7 @@ export default function EditUniversityPage() {
       onSubmit={onSubmit}
       isLoading={updateMutation.isPending}
       isError={updateMutation.isError}
-      errorMessage="Failed to update university. Please check validation rules."
+      errorMessage={updateMutation.error ? getErrorMessage(updateMutation.error) : undefined}
       title={`Edit University: ${university.name || id}`}
       submitText="Update University"
       onCancel={() => router.push("/admin/dashboard/universities")}

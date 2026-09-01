@@ -9,6 +9,8 @@ import FilterBar from "@/components/ui/FilterBar";
 import Pagination from "@/components/ui/Pagination";
 import ErrorState from "@/components/ui/ErrorState";
 import EmptyState from "@/components/ui/EmptyState";
+import { Loading } from "@/components/ui/Loading";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import type { UniversityType } from "@/types";
 
 import { PROVINCE_OPTIONS, UNIVERSITY_TYPE_OPTIONS } from "@/data/optionsData";
@@ -27,12 +29,13 @@ export default function UniversitiesPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(12);
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 400);
   const [province, setProvince] = useState("");
   const [type, setType] = useState<UniversityType | "">("");
 
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
-    queryKey: ["universities", page, limit, search, province, type],
-    queryFn: () => getUniversities({ page, limit, search, province, type: type || undefined }),
+    queryKey: ["universities", page, limit, debouncedSearch, province, type],
+    queryFn: () => getUniversities({ page, limit, search: debouncedSearch, province, type: type || undefined }),
   });
 
   return (
@@ -82,10 +85,7 @@ export default function UniversitiesPage() {
         {isLoading && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div
-                key={i}
-                className="animate-pulse bg-white rounded-2xl border border-gray-100 p-6 h-[400px]"
-              />
+              <Loading key={i} variant="skeleton" className="rounded-2xl border border-gray-100 h-[400px]" />
             ))}
           </div>
         )}
@@ -121,7 +121,7 @@ export default function UniversitiesPage() {
               totalPages={data.totalPages}
               totalItems={data.total}
               itemsPerPage={limit}
-              pageSizeOptions={[10, 20, 30]}
+              pageSizeOptions={[12, 24, 36]}
               onPageChange={setPage}
               onItemsPerPageChange={(newLimit) => {
                 setLimit(newLimit);

@@ -4,9 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { logoutStudent, getStudentProfile } from "@/services/authService";
-import Modal from "@/components/ui/Modal";
-import Button from "@/components/ui/Button";
-import Sidebar, { SidebarLink } from "@/components/layout/Sidebar";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import Sidebar from "@/components/layout/Sidebar";
 import Loading from "@/components/ui/Loading";
 
 export default function StudentDashboardLayout({
@@ -31,7 +30,15 @@ export default function StudentDashboardLayout({
     }
   }, [isError, router]);
 
-
+  const handleLogout = async () => {
+    try {
+      await logoutStudent();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      router.push("/login");
+    }
+  };
 
   if (isLoading) {
     return <Loading variant="page" className="min-h-screen bg-gray-50" />;
@@ -58,26 +65,14 @@ export default function StudentDashboardLayout({
       </main>
 
       {/*Logout Confirmation Modal*/}
-      <Modal
+      <ConfirmationModal
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogout}
         title="Confirm Log Out"
-        size="sm"
-      >
-        <div className="space-y-4">
-          <p className="text-sm text-gray-500 leading-relaxed">
-            Are you sure you want to log out of your student workspace? You will need to log back in to access your dashboard.
-          </p>
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-            <Button variant="ghost" onClick={() => setIsLogoutModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="danger" onClick={() => logoutStudent()}>
-              Log Out
-            </Button>
-          </div>
-        </div>
-      </Modal>
+        message="Are you sure you want to log out of your student workspace? You will need to log back in to access your dashboard."
+        confirmText="Log Out"
+      />
     </div>
   );
 }

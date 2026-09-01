@@ -33,42 +33,72 @@ export function useConversationSocket({
 }: UseConversationSocketOptions): UseConversationSocketResult {
   const queryClient = useQueryClient();
   const socketRef = useRef<Socket | null>(null);
+  const activeConvRef = useRef<Conversation | null>(activeConv);
+  const getPeerIdRef = useRef(getPeerId);
+  const messagesEndRefInternal = useRef(messagesEndRef);
+
+  activeConvRef.current = activeConv;
+  getPeerIdRef.current = getPeerId;
+  messagesEndRefInternal.current = messagesEndRef;
+
   const [isOnline, setIsOnline] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
+  // 1. Establish persistent Socket.io connection on mount
   useEffect(() => {
     const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ?? "http://localhost:3002";
-    const peerId = activeConv ? getPeerId(activeConv) : null;
 
     const socket = io(backendUrl, {
       withCredentials: true,
       transports: ["websocket", "polling"],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
+      reconnectionDelayMax: 10000,
+      timeout: 10000,
     });
     socketRef.current = socket;
 
+    socket.on("connect_error", () => {
+      setIsOnline(false);
+      setIsTyping(false);
+    });
+
+    socket.on("disconnect", () => {
+      setIsOnline(false);
+      setIsTyping(false);
+    });
+
     socket.on("connect", () => {
-      if (peerId) {
-        socket.emit("presence:query", peerId);
+      const currentConv = activeConvRef.current;
+      if (currentConv) {
+        socket.emit("join:conversation", currentConv.id);
+        const peerId = getPeerIdRef.current(currentConv);
+        if (peerId) {
+          socket.emit("presence:query", peerId);
+        }
       }
     });
 
     socket.on("message:new", (message: Message) => {
-      if (activeConv && message.conversationId === activeConv.id) {
-        queryClient.setQueryData<Message[]>(["messagesThread", activeConv.id], (old = []) => {
+      const currentConv = activeConvRef.current;
+      if (currentConv && message.conversationId === currentConv.id) {
+        queryClient.setQueryData<Message[]>(["messagesThread", currentConv.id], (old = []) => {
           if (old.some((m) => m.id === message.id)) return old;
           return [...old, message];
         });
         setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+          messagesEndRefInternal.current.current?.scrollIntoView({ behavior: "smooth" });
         }, 100);
       }
       queryClient.invalidateQueries({ queryKey: ["conversationsList"] });
     });
 
     socket.on("messages:read", ({ conversationId }: { conversationId: string }) => {
-      if (activeConv && conversationId === activeConv.id) {
-        queryClient.setQueryData<Message[]>(["messagesThread", activeConv.id], (old = []) =>
+      const currentConv = activeConvRef.current;
+      if (currentConv && conversationId === currentConv.id) {
+        queryClient.setQueryData<Message[]>(["messagesThread", currentConv.id], (old = []) =>
           old.map((m) => ({ ...m, status: "read" as const })),
         );
       }
@@ -79,18 +109,24 @@ export function useConversationSocket({
     });
 
     socket.on("status:update", ({ userId, status }: { userId: string; status: string }) => {
+      const currentConv = activeConvRef.current;
+      const peerId = currentConv ? getPeerIdRef.current(currentConv) : null;
       if (peerId && peerId === userId) {
         setIsOnline(status === "online");
       }
     });
 
     socket.on("presence:res", ({ userId, isOnline: online }: { userId: string; isOnline: boolean }) => {
+      const currentConv = activeConvRef.current;
+      const peerId = currentConv ? getPeerIdRef.current(currentConv) : null;
       if (peerId && peerId === userId) {
         setIsOnline(online);
       }
     });
 
     socket.on("user:typing", ({ userId, isTyping: typing }: { userId: string; isTyping: boolean }) => {
+      const currentConv = activeConvRef.current;
+      const peerId = currentConv ? getPeerIdRef.current(currentConv) : null;
       if (peerId && peerId === userId) {
         setIsTyping(typing);
       }
@@ -98,25 +134,31 @@ export function useConversationSocket({
 
     return () => {
       socket.disconnect();
+      socketRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- getPeerId is expected to be referentially stable (a plain field accessor)
-  }, [activeConv, queryClient, messagesEndRef]);
+  }, [queryClient]);
 
-  // Join/leave the active conversation's room.
+  // 2. Join/leave conversation rooms and query presence when active conversation changes
   useEffect(() => {
-    if (!socketRef.current || !activeConv) return;
+    const socket = socketRef.current;
+    if (!socket || !activeConv) {
+      setIsOnline(false);
+      setIsTyping(false);
+      return;
+    }
 
-    socketRef.current.emit("join:conversation", activeConv.id);
+    setIsTyping(false);
+    setIsOnline(false);
+    socket.emit("join:conversation", activeConv.id);
     const peerId = getPeerId(activeConv);
     if (peerId) {
-      socketRef.current.emit("presence:query", peerId);
+      socket.emit("presence:query", peerId);
     }
 
     return () => {
-      socketRef.current?.emit("leave:conversation", activeConv.id);
+      socket.emit("leave:conversation", activeConv.id);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeConv]);
+  }, [activeConv?.id, getPeerId]);
 
   const emitTyping = (typing: boolean) => {
     if (socketRef.current && activeConv) {

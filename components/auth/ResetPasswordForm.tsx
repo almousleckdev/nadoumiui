@@ -12,10 +12,11 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { AuthLayout } from "./AuthLayout";
 import { getErrorMessage } from "@/utils/getErrorMessage";
+import { passwordRule } from "@/lib/validations/password";
 
 const resetPasswordSchema = z
   .object({
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    password: passwordRule,
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {

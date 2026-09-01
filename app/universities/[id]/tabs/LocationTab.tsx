@@ -1,5 +1,6 @@
 import React from "react";
 import type { University } from "@/types";
+import { getSafeExternalUrl } from "@/utils/resolveUrl";
 import {
   MapPinIcon,
   GlobeAltIcon,
@@ -13,6 +14,7 @@ import {
 export function LocationTab({ university }: { university: University }) {
   const city = university.city || "China";
   const province = university.province || "Mainland China";
+  const safeWebsite = getSafeExternalUrl(university.officialWebsite);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -44,13 +46,9 @@ export function LocationTab({ university }: { university: University }) {
           </div>
 
           <div className="space-y-4">
-            {university.officialWebsite ? (
+            {safeWebsite ? (
               <a
-                href={
-                  university.officialWebsite.startsWith("http")
-                    ? university.officialWebsite
-                    : `https://${university.officialWebsite}`
-                }
+                href={safeWebsite}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-4 rounded-2xl bg-white hover:bg-gray-50 border border-gray-200 flex items-center justify-between transition-colors group shadow-2xs"
@@ -62,7 +60,7 @@ export function LocationTab({ university }: { university: University }) {
                       Official Portal
                     </span>
                     <span className="font-bold text-sm text-gray-900 group-hover:text-blue-600">
-                      {university.officialWebsite.replace(/^https?:\/\//, "")}
+                      {university.officialWebsite?.replace(/^https?:\/\//, "")}
                     </span>
                   </div>
                 </div>

@@ -7,6 +7,8 @@ import { type UniversityFormValues } from "@/lib/validations/university";
 import { UniversityForm } from "@/features/universities/components/UniversityForm";
 import { toast } from "react-hot-toast";
 
+import { getErrorMessage } from "@/utils/getErrorMessage";
+
 export default function NewUniversityPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -18,8 +20,8 @@ export default function NewUniversityPage() {
       toast.success("University onboarded successfully!");
       router.push("/admin/dashboard/universities");
     },
-    onError: () => {
-      toast.error("Failed to onboard university");
+    onError: (err: unknown) => {
+      toast.error(getErrorMessage(err));
     }
   });
 
@@ -32,7 +34,7 @@ export default function NewUniversityPage() {
       onSubmit={onSubmit}
       isLoading={createMutation.isPending}
       isError={createMutation.isError}
-      errorMessage="Failed to onboard university. Check the unique ID constraint or validation rules."
+      errorMessage={createMutation.error ? getErrorMessage(createMutation.error) : undefined}
       title="Onboard Partner University"
       subtitle="Enterprise-grade institution registry with strict validation."
       submitText="Save University"

@@ -11,6 +11,7 @@ import { ScholarshipForm } from "@/features/scholarships/components/ScholarshipF
 import Loading from "@/components/ui/Loading";
 import ErrorState from "@/components/ui/ErrorState";
 import { toast } from "react-hot-toast";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 export default function EditScholarshipPage() {
   const router = useRouter();
@@ -37,8 +38,8 @@ export default function EditScholarshipPage() {
       toast.success("Scholarship updated successfully!");
       router.push("/admin/dashboard/scholarships");
     },
-    onError: () => {
-      toast.error("Failed to update scholarship.");
+    onError: (err: unknown) => {
+      toast.error(getErrorMessage(err));
     },
   });
 

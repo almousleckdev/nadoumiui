@@ -129,8 +129,9 @@ export async function forgotPassword(email: string): Promise<void> {
 export async function resetPassword(
   otp: string,
   password: string,
+  email: string,
 ): Promise<void> {
-  await apiClient.post("/students/reset-password", { otp, password });
+  await apiClient.post("/students/reset-password", { otp, password, email });
 }
 
 // POST /api/students/me/password
